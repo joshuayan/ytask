@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">YTask</string>
+    <string name="txt_sigin_in_button">登 录</string>
+    <string name="hint_sign_in_password">密码</string>
+    <string name="hint_sign_in_mobile">手机号</string>
+    <string name="err_mobile_required">手机号不能为空</string>
+    <string name="err_password_required">密码不能为空</string>
+    <string name="err_get_token_failed">获取token失败，请检查网络</string>
+    <string name="hint_all_in_one_input">请输入指令</string>
+    <string name="hint_new_input">请输入任务信息</string>
+</resources>

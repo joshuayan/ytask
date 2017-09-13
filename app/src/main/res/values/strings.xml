@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">YTask</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="hint_sign_in_mobile">Mobile Number</string>
+    <string name="hint_sign_in_password">Password</string>
+    <string name="txt_sigin_in_button">Sign In</string>
+    <string name="err_mobile_required">Mobile Number required</string>
+    <string name="err_password_required">Password required</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="err_get_token_failed">Failed to get token</string>
+    <string name="title_activity_splash_screen">SplashScreenActivity</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_all_in_one_input">input action</string>
+    <string name="hint_new_input">Input message</string>
+</resources>
