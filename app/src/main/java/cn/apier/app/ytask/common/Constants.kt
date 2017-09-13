@@ -13,4 +13,6 @@ object Constants {
     val SLOT_TIME = "sys_time"
     val SLOT_TODO = "user_todo"
 
+    val CMD_ADD_TASK = "添加任务"
+
 }

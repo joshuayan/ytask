@@ -75,7 +75,10 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         voiceRecognizer.setVoiceRecognizerCallback(VoiceRecognizeCallback { text ->
             Log.d("ytask", "voice text:$text")
 //            messageInput.inputEditText.setText(text)
-            msgAdapter.addMessage(text)
+
+
+            val txtMsg = if (text.startsWith(Constants.CMD_ADD_TASK)) text else Constants.CMD_ADD_TASK + text
+            msgAdapter.addMessage(txtMsg)
 
             val msg = Message(mid++.toString(), sender, text)
 
@@ -137,7 +140,7 @@ class NewFragment : Fragment(), MessageInput.InputListener,
             override fun onError(error: UnitError) {
 
             }
-        }, Constants.SCENE_ID, message.text, sessionId)
+        }, Constants.SCENE_ID, message.text, System.currentTimeMillis().toString())
 
     }
 
@@ -165,10 +168,10 @@ class NewFragment : Fragment(), MessageInput.InputListener,
                     "add_task_satisfy" -> {
 
                         if (response.result.schema != null) {
-                            val schema=response.result.schema!!
-                            val items=schema.getSlotsByType(Constants.SLOT_TIME)
-                            val todos=schema.getSlotsByType(Constants.SLOT_TODO)
-                            val msg="time:${items[0].normalizedWord},task:${todos.map { it.normalizedWord }.joinToString()}"
+                            val schema = response.result.schema!!
+                            val items = schema.getSlotsByType(Constants.SLOT_TIME)
+                            val todos = schema.getSlotsByType(Constants.SLOT_TODO)
+                            val msg = "time:${items[0]?.normalizedWord?:""},task:${todos.map { it.normalizedWord }.joinToString()}"
                             msgAdapter.addMessage(msg)
 
                         }
@@ -214,7 +217,9 @@ class NewFragment : Fragment(), MessageInput.InputListener,
     }
 
 
-    override fun onSubmit(input: CharSequence?): Boolean {
+    override fun onSubmit(input: CharSequence): Boolean {
+        val message = Message(mid++.toString(), sender, input.toString())
+        sendMessage(message)
         return true
     }
 
