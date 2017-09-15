@@ -43,28 +43,6 @@
             </intent-filter>
         </activity>
 
-
-
-
-        <!-- begin: baidu speech sdk-->
-        <!-- 请填写应用实际的APP_ID -->
-        <meta-data android:name="com.baidu.speech.APP_ID" android:value="9950098"/>
-        <!-- 请填写应用实际的API_KEY -->
-        <meta-data android:name="com.baidu.speech.API_KEY" android:value="oFF4f0AIikUfoXToldBkd4lj"/>
-        <!-- 请填写应用实际的SECRET_KEY -->
-        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="D0Z8Y9R9KQERpgg9rx8ojmClwRPlvs7a"/>
-        <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false" ></service>
-        <activity
-            android:name="com.baidu.voicerecognition.android.ui.BaiduASRDigitalDialog"
-            android:configChanges="orientation|keyboardHidden|screenLayout"
-            android:theme="@android:style/Theme.Dialog"
-            android:exported="false"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="com.baidu.action.RECOGNIZE_SPEECH" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

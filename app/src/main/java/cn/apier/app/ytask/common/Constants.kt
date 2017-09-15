@@ -14,5 +14,7 @@ object Constants {
     val SLOT_TODO = "user_todo"
 
     val CMD_ADD_TASK = "添加任务"
+    //讯飞app id
+    val XF_APP_ID = "59ad650c"
 
 }

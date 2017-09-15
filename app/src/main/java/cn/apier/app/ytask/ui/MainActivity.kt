@@ -6,18 +6,8 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentTransaction
-import android.support.v7.app.AppCompatActivity
-import android.text.TextUtils
-import android.util.Log
 import cn.apier.app.ytask.R
-import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
-import com.baidu.aip.unit.APIService
-import com.baidu.aip.unit.exception.UnitError
-import com.baidu.aip.unit.listener.OnResultListener
-import com.baidu.aip.unit.model.AccessToken
-import io.reactivex.Scheduler
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : FragmentActivity() {
@@ -44,7 +34,6 @@ class MainActivity : FragmentActivity() {
 
         this.yTaskApplication = this.getApplication() as YTaskApplication
 
-        initAccessToken()
     }
 
 
@@ -87,29 +76,6 @@ class MainActivity : FragmentActivity() {
         listOf(todoFragment, newFragment, finishedFragment).forEach { it?.also { fg -> fragmentTransaction.hide(fg) } }
     }
 
-    /**
-     * 为了防止破解app获取ak，sk，建议您把ak，sk放在服务器端。
-     */
-    private fun initAccessToken() {
-
-        APIService.getInstance().init(applicationContext)
-        this.yTaskApplication.retrofit().create(UserApi::class.java).queryBDApplicationInfo().subscribeOn(Schedulers.io()).subscribe {
-
-            APIService.getInstance().initAccessToken(object : OnResultListener<AccessToken> {
-                override fun onResult(result: AccessToken) {
-                    val accessToken = result.accessToken
-                    Log.i("MainActivity", "AccessToken->" + result.accessToken)
-                    if (!TextUtils.isEmpty(accessToken)) {
-                    }
-
-                }
-
-                override fun onError(error: UnitError) {
-                    Log.i("wtf", "AccessToken->" + error.errorMessage)
-                }
-            }, it.data?.appKey, it.data?.secretKey)
-        }
-    }
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {

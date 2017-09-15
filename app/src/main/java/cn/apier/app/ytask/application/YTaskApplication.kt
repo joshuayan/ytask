@@ -5,8 +5,9 @@ import android.util.Log
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.common.Constants
-import cn.apier.app.ytask.common.Utils
+import cn.apier.app.ytask.util.Utils
 import cn.apier.app.ytask.interceptor.RequestInterceptor
+import com.iflytek.cloud.SpeechUtility
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
@@ -36,6 +37,9 @@ class YTaskApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         currentApplication = this
+
+        SpeechUtility.createUtility(this, "appid=${Constants.XF_APP_ID}")
+
     }
 
     fun retrofit(): Retrofit {

@@ -1,9 +1,6 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
@@ -25,7 +22,6 @@ android {
         abortOnError false
     }
 }
-
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.0.2'
@@ -45,5 +41,4 @@ dependencies {
     implementation 'org.jetbrains.anko:anko:0.10.1'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.alibaba:fastjson:1.1.63.android'
-    implementation project(':chatkit')
 }

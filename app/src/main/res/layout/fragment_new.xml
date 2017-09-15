@@ -10,7 +10,17 @@
         android:id="@+id/rv_message"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/input" />
+        android:layout_above="@+id/btnSpeech">
+
+    </android.support.v7.widget.RecyclerView>
+
+    <Button
+        android:id="@+id/btnSpeech"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="开始语音" />
 
     <!--<EditText-->
         <!--android:id="@+id/txt_input_action"-->
@@ -22,13 +32,5 @@
         <!--android:inputType="textPersonName"-->
         <!--android:singleLine="true" />-->
 
-    <com.baidu.aip.chatkit.message.MessageInput
-        android:id="@+id/input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/input_bg_color"
-        app:inputBackground="@drawable/chat_text_input_bg"
-        app:voiceInputBackground="@drawable/chat_speaker"
-        app:inputHint="@string/hint_new_input"/>
+
 </RelativeLayout>

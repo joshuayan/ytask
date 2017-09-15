@@ -1,59 +1,119 @@
 package cn.apier.app.ytask.ui
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.common.Constants
-import com.baidu.aip.chatkit.message.MessageInput
-import com.baidu.aip.chatkit.model.Message
-import com.baidu.aip.chatkit.model.User
-import com.baidu.aip.unit.APIService
-import com.baidu.aip.unit.exception.UnitError
-import com.baidu.aip.unit.listener.OnResultListener
-import com.baidu.aip.unit.listener.VoiceRecognizeCallback
-import com.baidu.aip.unit.model.CommunicateResponse
-import com.baidu.aip.unit.voice.VoiceRecognizer
-import java.util.*
+import cn.apier.app.ytask.util.JsonParser
+import com.iflytek.aiui.AIUIAgent
+import com.iflytek.aiui.AIUIConstant
+import com.iflytek.aiui.AIUIMessage
+import com.iflytek.cloud.ErrorCode
+import com.iflytek.cloud.RecognizerResult
+import com.iflytek.cloud.SpeechError
+import com.iflytek.cloud.ui.RecognizerDialog
+import com.iflytek.cloud.ui.RecognizerDialogListener
+import java.io.IOException
 
-class NewFragment : Fragment(), MessageInput.InputListener,
-        MessageInput.VoiceInputListener {
-
-
-    private lateinit var voiceRecognizer: VoiceRecognizer
-    private var mid: Int = 0
+class NewFragment : Fragment() {
 
 
-    private lateinit var messageInput: MessageInput
-    private lateinit var sender: User
-
-//    private var messageInput: MessageInput? = null
-
-    private var sessionId: String = ""
     private lateinit var msgAdapter: MessageViewAdapter
+    private lateinit var mIatDialog: RecognizerDialog
+    private lateinit var mToast: Toast
+
+    private lateinit var aiuiAgent: AIUIAgent
+    private var aiuiState = AIUIConstant.STATE_IDLE
 
     private var mListener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mToast = Toast.makeText(this.activity, "", Toast.LENGTH_SHORT)
 
-        sender = User("0", "kf", "", true)
+//        mIatDialog = RecognizerDialog(this.activity, { code ->
+//            run {
+//                Log.d(Constants.TAG_LOG, "SpeechRecognizer init() code = " + code)
+//                if (code != ErrorCode.SUCCESS) {
+//                    showTip("初始化失败，错误码：" + code)
+//                }
+//            }
+//        })
+//
+//        mIatDialog.setParameter("asr_sch", "1");
+//        mIatDialog.setParameter("nlp_version", "3.0");
+//        mIatDialog.setListener(object : RecognizerDialogListener {
+//            override fun onResult(result: RecognizerResult, p1: Boolean) {
+//
+//                val txt = JsonParser.parseIatResult(result.resultString)
+//
+//                Log.d(Constants.TAG_LOG, "text result:$txt from json [[${result.resultString}]]")
+//                msgAdapter.addMessage(txt)
+//            }
+//
+//            override fun onError(p0: SpeechError?) {
+//            }
+//
+//        })
+
+        aiuiAgent = AIUIAgent.createAgent(this.activity, getAIUIParams(), { aiuiEvent ->
+            run {
+                when (aiuiEvent.eventType) {
+                    AIUIConstant.EVENT_RESULT -> {
+                        Log.d(Constants.TAG_LOG, "got result:${aiuiEvent.info}")
+                    }
+                    AIUIConstant.EVENT_STATE -> {
+                        Log.d(Constants.TAG_LOG, "state event: ${aiuiEvent.arg1}")
+                        this.aiuiState = aiuiEvent.arg1
+                    }
+                    AIUIConstant.EVENT_SLEEP -> Log.d(Constants.TAG_LOG, "sleep.")
+                    AIUIConstant.EVENT_START_RECORD -> Log.d(Constants.TAG_LOG, "start record.")
+
+                    AIUIConstant.EVENT_STOP_RECORD -> {
+                        Log.d(Constants.TAG_LOG, "stop record.")
+                    }
+
+                    else -> {
+                        Log.d(Constants.TAG_LOG, "got other event: ${aiuiEvent.eventType},code:${aiuiEvent.arg1},info: ${aiuiEvent.info}")
+                    }
+                }
+            }
+        })
+        val startMsg = AIUIMessage(AIUIConstant.CMD_START, 0, 0, null, null)
+        aiuiAgent.sendMessage(startMsg)
+
+    }
 
 
+    private fun getAIUIParams(): String {
+        var params = ""
+
+        val assetManager = resources.assets
+        try {
+            val ins = assetManager.open("cfg/aiui_phone.cfg")
+            val buffer = ByteArray(ins.available())
+
+            ins.read(buffer)
+            ins.close()
+
+            params = String(buffer)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return params
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -67,37 +127,28 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         msgAdapter = MessageViewAdapter()
         rvMessage.adapter = msgAdapter
 
-        messageInput = view.findViewById(R.id.input)
 
 
-        voiceRecognizer = VoiceRecognizer()
-        voiceRecognizer.init(this.activity, messageInput.getVoiceInputButton())
-        voiceRecognizer.setVoiceRecognizerCallback(VoiceRecognizeCallback { text ->
-            Log.d("ytask", "voice text:$text")
-//            messageInput.inputEditText.setText(text)
+        view.findViewById<Button>(R.id.btnSpeech).setOnClickListener {
+            //            mIatDialog.show()
 
+            if (this.aiuiState != AIUIConstant.STATE_WORKING) {
+                val wakeUpMsg = AIUIMessage(AIUIConstant.CMD_WAKEUP, 0, 0, null, null)
+                aiuiAgent.sendMessage(wakeUpMsg)
 
-            val txtMsg = if (text.startsWith(Constants.CMD_ADD_TASK)) text else Constants.CMD_ADD_TASK + text
-            msgAdapter.addMessage(txtMsg)
-
-            val msg = Message(mid++.toString(), sender, text)
-
-            sendMessage(msg)
-
-
-        })
-        messageInput.inputEditText.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEND) {
-                onSubmit(v.editableText)
-                v.text = ""
             }
-            true
-        })
-
-        messageInput.setInputListener(this)
-        messageInput.setAudioInputListener(this)
+            val params = "sample_rate=16000,data_type=audio"
+            val writeMsg = AIUIMessage(AIUIConstant.CMD_START_RECORD, 0, 0, params, null)
+            aiuiAgent.sendMessage(writeMsg)
+        }
 
         return view
+    }
+
+
+    private fun showTip(str: String) {
+        mToast.setText(str)
+        mToast.show()
     }
 
     fun onButtonPressed(uri: Uri) {
@@ -125,81 +176,6 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
-        voiceRecognizer.onActivityResult(requestCode, resultCode, data)
-    }
-
-
-    private fun sendMessage(message: Message) {
-
-        APIService.getInstance().communicate(object : OnResultListener<CommunicateResponse> {
-            override fun onResult(result: CommunicateResponse) {
-
-                handleResponse(result)
-            }
-
-            override fun onError(error: UnitError) {
-
-            }
-        }, Constants.SCENE_ID, message.text, System.currentTimeMillis().toString())
-
-    }
-
-    private fun handleResponse(response: CommunicateResponse?) {
-        if (response != null) {
-            sessionId = response.result.sessionId
-
-            //  如果有对于的动作action，请执行相应的逻辑
-            val actionList = response.result.actionList
-            for (action in actionList) {
-
-                if (!TextUtils.isEmpty(action.say)) {
-                    val sb = StringBuilder()
-                    sb.append(action.say)
-
-                    val message = Message(mid++.toString(), sender, sb.toString(), Date())
-//                    messagesAdapter.addToStart(message, true)
-//                    if (action.hintList.size > 0) {
-//                        message.hintList = action.hintList
-//                    }
-
-                }
-
-                when (action.actionId) {
-                    "add_task_satisfy" -> {
-
-                        if (response.result.schema != null) {
-                            val schema = response.result.schema!!
-                            val items = schema.getSlotsByType(Constants.SLOT_TIME)
-                            val todos = schema.getSlotsByType(Constants.SLOT_TODO)
-                            val msg = "time:${items[0]?.normalizedWord?:""},task:${todos.map { it.normalizedWord }.joinToString()}"
-                            msgAdapter.addMessage(msg)
-
-                        }
-
-//                        val msg = response.result.schema?.botMergedSlots?.joinToString { "$it," } ?: ""
-//                        Log.d(Constants.TAG_LOG, "Add Task. $msg")
-//
-//                        msgAdapter.addMessage(msg)
-                    }
-                    else -> Log.e(Constants.TAG_LOG, "Unknown ActionId ${action.actionId}")
-                }
-
-//                // 执行自己的业务逻辑
-//                if ("start_work_satisfy" == action.actionId) {
-//                    Log.i("wtf", "开始扫地")
-//                } else if ("stop_work_satisfy" == action.actionId) {
-//                    Log.i("wtf", "停止工作")
-//                } else if ("move_action_satisfy" == action.actionId) {
-//                    Log.i("wtf", "移动")
-//                } else if ("timed_charge_satisfy" == action.actionId) {
-//                    Log.i("wtf", "定时充电")
-//                } else if ("timed_task_satisfy" == action.actionId) {
-//                    Log.i("wtf", "定时扫地")
-//                } else if ("sing_song_satisfy" == action.actionId) {
-//                    Log.i("wtf", "唱歌")
-//                }
-            }
-        }
     }
 
 
@@ -214,22 +190,6 @@ class NewFragment : Fragment(), MessageInput.InputListener,
      */
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction(uri: Uri)
-    }
-
-
-    override fun onSubmit(input: CharSequence): Boolean {
-        val message = Message(mid++.toString(), sender, input.toString())
-        sendMessage(message)
-        return true
-    }
-
-    override fun onVoiceInputClick() {
-        if (ActivityCompat.checkSelfPermission(this.activity, Manifest.permission.RECORD_AUDIO) != PackageManager
-                .PERMISSION_GRANTED) {
-            this.requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 100)
-            return
-        }
-        voiceRecognizer.onClick()
     }
 
 
