@@ -93,7 +93,7 @@ class MainActivity : FragmentActivity() {
     private fun initAccessToken() {
 
         APIService.getInstance().init(applicationContext)
-        this.yTaskApplication.retrofit().create(UserApi::class.java).queryBDApplicationInfo().subscribeOn(Schedulers.io()).subscribe {
+        this.yTaskApplication.apiProxy(UserApi::class.java).queryBDApplicationInfo().subscribeOn(Schedulers.io()).subscribe {
 
             APIService.getInstance().initAccessToken(object : OnResultListener<AccessToken> {
                 override fun onResult(result: AccessToken) {

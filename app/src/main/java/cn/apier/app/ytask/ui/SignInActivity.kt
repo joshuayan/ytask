@@ -58,7 +58,7 @@ class SignInActivity : AppCompatActivity() {
 
 
             val application = this.application as YTaskApplication
-            application.retrofit().create(UserApi::class.java).signIn(mobile, password).subscribeOn(Schedulers.io())
+            application.apiProxy(UserApi::class.java).signIn(mobile, password).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe { result ->
                 Log.d("ytask", result.toString())
                 if (result.success) {

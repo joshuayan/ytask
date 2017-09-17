@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -18,16 +19,25 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import cn.apier.app.ytask.R
+import cn.apier.app.ytask.api.TaskApi
+import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
+import cn.apier.app.ytask.domain.service.TaskService
 import com.baidu.aip.chatkit.message.MessageInput
 import com.baidu.aip.chatkit.model.Message
 import com.baidu.aip.chatkit.model.User
+import com.baidu.aip.chatkit.utils.DateFormatter
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
 import com.baidu.aip.unit.listener.VoiceRecognizeCallback
 import com.baidu.aip.unit.model.CommunicateResponse
 import com.baidu.aip.unit.voice.VoiceRecognizer
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.support.v4.toast
+import java.time.Instant
+import java.time.LocalDate
 import java.util.*
 
 class NewFragment : Fragment(), MessageInput.InputListener,
@@ -36,6 +46,8 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     private lateinit var voiceRecognizer: VoiceRecognizer
     private var mid: Int = 0
+    private val taskService = TaskService()
+    private val taskApi: TaskApi = YTaskApplication.currentApplication.apiProxy(TaskApi::class.java)
 
 
     private lateinit var messageInput: MessageInput
@@ -78,9 +90,11 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
 
             val txtMsg = if (text.startsWith(Constants.CMD_ADD_TASK)) text else Constants.CMD_ADD_TASK + text
+
+            Log.d(Constants.TAG_LOG, "msg to send:$txtMsg")
             msgAdapter.addMessage(txtMsg)
 
-            val msg = Message(mid++.toString(), sender, text)
+            val msg = Message(mid++.toString(), sender, txtMsg)
 
             sendMessage(msg)
 
@@ -164,22 +178,15 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
                 }
 
+                Log.d(Constants.TAG_LOG, "actionId:${action.actionId}")
                 when (action.actionId) {
+                    "add_task_cmd_satisfy" -> {
+
+                        handleBusiness(response)
+                    }
+
                     "add_task_satisfy" -> {
-
-                        if (response.result.schema != null) {
-                            val schema = response.result.schema!!
-                            val items = schema.getSlotsByType(Constants.SLOT_TIME)
-                            val todos = schema.getSlotsByType(Constants.SLOT_TODO)
-                            val msg = "time:${items[0]?.normalizedWord?:""},task:${todos.map { it.normalizedWord }.joinToString()}"
-                            msgAdapter.addMessage(msg)
-
-                        }
-
-//                        val msg = response.result.schema?.botMergedSlots?.joinToString { "$it," } ?: ""
-//                        Log.d(Constants.TAG_LOG, "Add Task. $msg")
-//
-//                        msgAdapter.addMessage(msg)
+                        handleBusiness(response)
                     }
                     else -> Log.e(Constants.TAG_LOG, "Unknown ActionId ${action.actionId}")
                 }
@@ -199,6 +206,68 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 //                    Log.i("wtf", "唱歌")
 //                }
             }
+        }
+    }
+
+    private fun handleBusiness(response: CommunicateResponse) {
+        if (response.result.schema != null) {
+            val schema = response.result.schema!!
+            val cmd = schema.getSlotsByType(Constants.SLOT_CMD)
+            val items = schema.getSlotsByType(Constants.SLOT_TIME)
+            val todos = schema.getSlotsByType(Constants.SLOT_TODO)
+
+            val task = todos.map { it.normalizedWord }.joinToString()
+
+
+            val msg = "command:${if (cmd.isNotEmpty()) cmd[0]?.normalizedWord else ""},time:${if (items.isNotEmpty()) items[0]?.normalizedWord else ""},task:${task}"
+            msgAdapter.addMessage(msg)
+
+
+            var deadLine: String? = null
+            if (items.isNotEmpty()) {
+
+                val timeStr = items[0].normalizedWord
+                with(timeStr) {
+                    when {
+                        matches("""\d{4}-\d{2}-\d{2}\|\d{2}:\d{2}:\d{2}""".toRegex()) -> {
+                            deadLine = replace("|", " ")
+                        }
+                        matches("""\d{4}-\d{2}-\d{2}""".toRegex()) -> {
+                            deadLine = "$timeStr 00:00:00"
+                        }
+                        matches("""\d{2}:\d{2}:\d{2}""".toRegex()) -> {
+                            val now = Date(System.currentTimeMillis())
+                            val dateStr = DateFormatter.format(now, "yyyy-MM-dd")
+                            deadLine = "$dateStr $timeStr"
+                        }
+                        isEmpty() -> {
+                            Log.d(Constants.TAG_LOG, "No Time info")
+                        }
+                        else -> {
+                            Log.d(Constants.TAG_LOG, "Unknown")
+                        }
+                    }
+                }
+                Log.d(Constants.TAG_LOG, "deadLine:$deadLine")
+                Log.d(Constants.TAG_LOG, "task:$task")
+            }
+
+
+            this.taskApi.newTask(task, deadLine).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                if (it.success) {
+                    toast("添加任务成功")
+                } else {
+                    Log.e(Constants.TAG_LOG, "添加任务失败 ${it.status?.description}")
+
+                    toast("添加任务失败")
+                }
+
+            }, {
+                Log.e(Constants.TAG_LOG, "添加任务失败${it.message}")
+                toast("添加任务失败")
+            }, {
+
+            })
         }
     }
 

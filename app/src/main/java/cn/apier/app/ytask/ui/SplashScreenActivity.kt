@@ -26,7 +26,8 @@ class SplashScreenActivity : AppCompatActivity() {
         val tvCountDown = find<TextView>(R.id.tvCountDown)
         tvCountDown.text = "10"
         val rangeFlow = Flowable.intervalRange(0L, 10L, 1000L, 1000L, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
             tvCountDown.text = "${9 - it}"
         }, {}, {
             if (app.tokenExist()) {

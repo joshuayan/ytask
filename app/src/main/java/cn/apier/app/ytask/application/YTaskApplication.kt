@@ -26,35 +26,49 @@ class YTaskApplication : Application() {
             private set
     }
 
-    var bdToken:String?=null
+    private var debug: Boolean = false
+
+    private lateinit var retrofit: Retrofit
+    var bdToken: String? = null
     var token: String? = null
     var signedIn: Boolean = false
         private set
     var signedUserId: String = ""
         private set
 
+
+    init {
+
+    }
+
     override fun onCreate() {
         super.onCreate()
         currentApplication = this
+        debug = this.resources.getBoolean(R.bool.debug)
+        retrofit = buildRetrofit()
     }
 
-    fun retrofit(): Retrofit {
+
+    fun <T : Any> apiProxy(clazz: Class<T>): T = this.retrofit.create(clazz)
+
+
+    private fun buildRetrofit(): Retrofit {
         val client = OkHttpClient.Builder().addInterceptor(RequestInterceptor()).build()
 
 
-        return Retrofit.Builder().baseUrl(Constants.BASE_URL)
+        return Retrofit.Builder().baseUrl(Constants.baseUrl(this.debug))
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(client)
                 .build()
     }
 
-    private fun sign(timestampInMs: String): String = Utils.md5(Constants.APP_KEY + Constants.APP_SECRET + timestampInMs) ?: ""
+    private fun sign(timestampInMs: String): String = Utils.md5(Constants.appKey(this.debug) + Constants.secretKey(this.debug) + timestampInMs) ?: ""
 
 
-    fun getToken(successFun: () -> Unit={}) {
+    fun getToken(successFun: () -> Unit = {}) {
         val timestampInMs = "${System.currentTimeMillis()}"
-        this.retrofit().create(UserApi::class.java).getToken(Constants.APP_KEY, timestampInMs, sign(timestampInMs)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+        this.apiProxy(UserApi::class.java).getToken(Constants.appKey(this.debug), timestampInMs, sign(timestampInMs)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 {
 
                     Log.d("ytask", it.toString())
