@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -22,7 +21,7 @@ import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
-import cn.apier.app.ytask.domain.service.TaskService
+import cn.apier.app.ytask.dto.TaskDto
 import com.baidu.aip.chatkit.message.MessageInput
 import com.baidu.aip.chatkit.model.Message
 import com.baidu.aip.chatkit.model.User
@@ -36,8 +35,6 @@ import com.baidu.aip.unit.voice.VoiceRecognizer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.support.v4.toast
-import java.time.Instant
-import java.time.LocalDate
 import java.util.*
 
 class NewFragment : Fragment(), MessageInput.InputListener,
@@ -46,7 +43,6 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     private lateinit var voiceRecognizer: VoiceRecognizer
     private var mid: Int = 0
-    private val taskService = TaskService()
     private val taskApi: TaskApi = YTaskApplication.currentApplication.apiProxy(TaskApi::class.java)
 
 
@@ -56,7 +52,7 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 //    private var messageInput: MessageInput? = null
 
     private var sessionId: String = ""
-    private lateinit var msgAdapter: MessageViewAdapter
+    private lateinit var taskViewAdapter: TaskViewAdapter
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -73,11 +69,11 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         // Inflate the layout for this fragment
         val view = inflater!!.inflate(R.layout.fragment_new, container, false)
 
-        val rvMessage: RecyclerView = view.findViewById(R.id.rv_message)
+        val rvTask: RecyclerView = view.findViewById(R.id.rv_task)
 
-        rvMessage.layoutManager = LinearLayoutManager(view.context)
-        msgAdapter = MessageViewAdapter()
-        rvMessage.adapter = msgAdapter
+        rvTask.layoutManager = LinearLayoutManager(view.context)
+        taskViewAdapter = TaskViewAdapter()
+        rvTask.adapter = taskViewAdapter
 
         messageInput = view.findViewById(R.id.input)
 
@@ -92,12 +88,11 @@ class NewFragment : Fragment(), MessageInput.InputListener,
             val txtMsg = if (text.startsWith(Constants.CMD_ADD_TASK)) text else Constants.CMD_ADD_TASK + text
 
             Log.d(Constants.TAG_LOG, "msg to send:$txtMsg")
-            msgAdapter.addMessage(txtMsg)
+//            msgAdapter.addMessage(txtMsg)
 
             val msg = Message(mid++.toString(), sender, txtMsg)
 
             sendMessage(msg)
-
 
         })
         messageInput.inputEditText.setOnEditorActionListener(TextView.OnEditorActionListener { v, actionId, _ ->
@@ -111,6 +106,7 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         messageInput.setInputListener(this)
         messageInput.setAudioInputListener(this)
 
+        updateData()
         return view
     }
 
@@ -220,7 +216,8 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
 
             val msg = "command:${if (cmd.isNotEmpty()) cmd[0]?.normalizedWord else ""},time:${if (items.isNotEmpty()) items[0]?.normalizedWord else ""},task:${task}"
-            msgAdapter.addMessage(msg)
+//            msgAdapter.addMessage(msg)
+            Log.d(Constants.TAG_LOG, "message:$msg")
 
 
             var deadLine: String? = null
@@ -256,6 +253,9 @@ class NewFragment : Fragment(), MessageInput.InputListener,
             this.taskApi.newTask(task, deadLine).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                 if (it.success) {
                     toast("添加任务成功")
+
+                    updateData()
+
                 } else {
                     Log.e(Constants.TAG_LOG, "添加任务失败 ${it.status?.description}")
 
@@ -268,6 +268,26 @@ class NewFragment : Fragment(), MessageInput.InputListener,
             }, {
 
             })
+        }
+    }
+
+
+    private fun updateData() {
+        this.taskApi.list(false).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            Log.d(Constants.TAG_LOG, "update data,result:$it")
+            if (it.success) {
+                taskViewAdapter.clear()
+                val tasks = it.data
+                Log.d(Constants.TAG_LOG, "tasks: ${tasks ?: "No tasks"}")
+                tasks?.let {
+                    it.forEach { task ->
+                        run {
+                            val taskDto = TaskDto(task.uid, task.content, task.deadLine)
+                            taskViewAdapter.addTask(taskDto)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -302,35 +322,48 @@ class NewFragment : Fragment(), MessageInput.InputListener,
     }
 
 
-    private class MessageViewAdapter : RecyclerView.Adapter<MessageViewAdapter.MessageViewHolder>() {
+    private class TaskViewAdapter : RecyclerView.Adapter<TaskViewAdapter.TaskViewHolder>() {
 
-        private var msgs: MutableList<String> = mutableListOf()
+        private var tasks: MutableList<TaskDto> = mutableListOf()
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
 
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.view_item_message, parent, false)
-            return MessageViewHolder(view)
+            val view = LayoutInflater.from(parent.context).inflate(R.layout.view_item_task, parent, false)
+            return TaskViewHolder(view)
 
         }
 
-        override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
 
-            holder.tvMsg.text = msgs[position]
+            holder.tvTask.text = tasks[position].content
+            tasks[position].deadLine?.let { holder.tvDeadline.text = it }
         }
 
-        fun addMessage(msg: String) {
-            msgs.add(msg)
+
+        fun addTask(taskDto: TaskDto) {
+            this.tasks.add(taskDto)
+            notifyDataSetChanged()
+        }
+
+
+        fun clear() {
+            this.tasks.clear()
             notifyDataSetChanged()
         }
 
         override fun getItemCount(): Int {
-            return msgs.size
+            return tasks.size
         }
 
         inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
             val tvMsg: TextView = itemView.findViewById(R.id.tvMsg)
 
+        }
+
+        inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val tvTask = itemView.findViewById<TextView>(R.id.tvTask)
+            val tvDeadline = itemView.findViewById<TextView>(R.id.tvDeadline)
         }
     }
 

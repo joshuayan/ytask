@@ -9,7 +9,7 @@ object Constants {
     private const val SECRET_KEY = "b5163126bf53e5fa458b9f8ffafa1b"
     private const val TEST_APP_SECRET = "bca2402e8b1b20f225eed04898a07d"
     private const val BASE_URL = "http://api.apier.cn"
-    private const val TEST_BASE_URL = "http://192.168.3.3:7700"
+    private const val TEST_BASE_URL = "http://192.168.0.92:7700"
     const val TAG_LOG = "ytask"
     const val SCENE_ID = 10602
 
