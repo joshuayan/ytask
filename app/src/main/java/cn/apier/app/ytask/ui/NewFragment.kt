@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -335,8 +336,15 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
         override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
 
-            holder.tvTask.text = tasks[position].content
-            tasks[position].deadLine?.let { holder.tvDeadline.text = it }
+            var deadLineStr: String? = null
+
+
+            tasks[position].deadLine?.let { deadLineStr = DateFormatter.format(Date(it.toLong()), "yyyy-MM-dd HH:mm:ss") }
+
+
+            holder.updateTask(tasks[position].content, deadLineStr)
+
+
         }
 
 
@@ -362,8 +370,14 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         }
 
         inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            val tvTask = itemView.findViewById<TextView>(R.id.tvTask)
-            val tvDeadline = itemView.findViewById<TextView>(R.id.tvDeadline)
+            private val tvTask = itemView.findViewById<TextView>(R.id.tvTask)
+            private val tvDeadline = itemView.findViewById<TextView>(R.id.tvDeadline)
+
+            fun updateTask(task: String, deadLine: String?) {
+                this.tvTask.text = task
+                this.tvDeadline.visibility = View.GONE
+                deadLine?.let { this.tvDeadline.text = it;this.tvDeadline.visibility = View.VISIBLE }
+            }
         }
     }
 

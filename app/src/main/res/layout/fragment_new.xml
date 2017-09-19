@@ -10,7 +10,9 @@
         android:id="@+id/rv_task"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/input" />
+        android:layout_above="@+id/input"
+        android:isScrollContainer="true"
+        android:overScrollMode="ifContentScrolls" />
 
     <!--<EditText-->
         <!--android:id="@+id/txt_input_action"-->
