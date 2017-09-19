@@ -6,25 +6,58 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentTransaction
-import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.util.Log
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
+import cn.apier.app.ytask.common.Constants
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
 import com.baidu.aip.unit.model.AccessToken
-import io.reactivex.Scheduler
+import com.baidu.tts.client.SpeechError
+import com.baidu.tts.client.SpeechSynthesizer
+import com.baidu.tts.client.SpeechSynthesizerListener
+import com.baidu.tts.client.TtsMode
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : FragmentActivity() {
 
-    private var todoFragment: Fragment? = null
-    private var newFragment: Fragment? = null
-    private var finishedFragment: Fragment? = null
+class MainActivity : FragmentActivity(),Speaker, SpeechSynthesizerListener {
+    override fun onSynthesizeStart(p0: String?) {
+        Log.d(Constants.TAG_LOG,"onSynthesizeStart")
+    }
+
+    override fun onSpeechFinish(p0: String?) {
+        Log.d(Constants.TAG_LOG,"onSpeechFinish")
+    }
+
+    override fun onSpeechProgressChanged(p0: String?, p1: Int) {
+        Log.d(Constants.TAG_LOG,"onSpeechProgressChanged")
+    }
+
+    override fun onSynthesizeFinish(p0: String?) {
+        Log.d(Constants.TAG_LOG,"onSynthesizeFinish")
+    }
+
+    override fun onSpeechStart(p0: String?) {
+        Log.d(Constants.TAG_LOG,"onSpeechStart")
+    }
+
+    override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int) {
+        Log.d(Constants.TAG_LOG,"onSynthesizeDataArrived")
+    }
+
+    override fun onError(p0: String?, p1: SpeechError?) {
+        Log.d(Constants.TAG_LOG,"onError")
+    }
+
+    private var todoFragment: TodoFragment? = null
+    private var newFragment: NewFragment? = null
+    private var finishedFragment: FinishedFragment? = null
+
+    private val speechSynthesizer = SpeechSynthesizer.getInstance()
 
     private lateinit var yTaskApplication: YTaskApplication
 
@@ -45,8 +78,43 @@ class MainActivity : FragmentActivity() {
         this.yTaskApplication = this.getApplication() as YTaskApplication
 
         initAccessToken()
+
+        initSpeech()
+
     }
 
+    private fun initSpeech() {
+        this.speechSynthesizer.setContext(this)
+        this.speechSynthesizer.setSpeechSynthesizerListener(this)
+
+        this.speechSynthesizer.setApiKey("ILo4xDbLmdmIE7peI60cec3n", "iAEX4xSreMCcTp4hUzLHl4fzDrOjpCua")
+        this.speechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0")
+        this.speechSynthesizer.setParam(SpeechSynthesizer.PARAM_MIX_MODE, SpeechSynthesizer.MIX_MODE_DEFAULT)
+        val authInfo = this.speechSynthesizer.auth(TtsMode.MIX)
+
+        if (authInfo.isSuccess()) {
+            Log.d(Constants.TAG_LOG, "auth success")
+        } else {
+            val errorMsg = authInfo.getTtsError().getDetailMessage()
+            Log.d(Constants.TAG_LOG, "auth failed errorMsg=$errorMsg")
+        }
+
+        // 初始化tts
+        speechSynthesizer.initTts(TtsMode.MIX)
+
+
+    }
+
+
+    override fun speak(txt: String) {
+        val result = this.speechSynthesizer.speak(txt)
+
+        Log.d(Constants.TAG_LOG, "speak result: $result")
+        if (result < 0) {
+            Log.e(Constants.TAG_LOG, "error,please look up error code in doc or URL:http://yuyin.baidu.com/docs/tts/122 ")
+        }
+
+    }
 
     private fun switchTab(itemId: Int) {
         var targetFragment: Fragment? = null
@@ -71,6 +139,8 @@ class MainActivity : FragmentActivity() {
             R.id.nav_new -> {
                 if (newFragment == null) {
                     newFragment = NewFragment()
+
+                    newFragment!!.setSpeaker(this)
                     fragmentTransaction.add(R.id.fragment_container, newFragment)
                 }
                 targetFragment = this.newFragment!!

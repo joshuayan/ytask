@@ -20,4 +20,5 @@
     <string name="hint_all_in_one_input">input action</string>
     <string name="hint_new_input">Input message</string>
     <bool name="debug">false</bool>
+    <string name="txt_task_add_success">Add task successfully</string>
 </resources>

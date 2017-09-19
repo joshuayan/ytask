@@ -9,4 +9,5 @@
     <string name="err_get_token_failed">获取token失败，请检查网络</string>
     <string name="hint_all_in_one_input">请输入指令</string>
     <string name="hint_new_input">请输入任务信息</string>
+    <string name="txt_task_add_success">添加任务成功</string>
 </resources>

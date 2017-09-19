@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.RadioButton
 import android.widget.TextView
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.TaskApi
@@ -35,11 +36,22 @@ import com.baidu.aip.unit.model.CommunicateResponse
 import com.baidu.aip.unit.voice.VoiceRecognizer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.support.v4.sp
 import org.jetbrains.anko.support.v4.toast
 import java.util.*
 
 class NewFragment : Fragment(), MessageInput.InputListener,
-        MessageInput.VoiceInputListener {
+        MessageInput.VoiceInputListener, SpeakerConsumer {
+
+//    private lateinit var speaker: Speaker
+
+    companion object {
+        lateinit var speaker: Speaker
+    }
+
+    override fun setSpeaker(speaker: Speaker) {
+        NewFragment.speaker = speaker
+    }
 
 
     private lateinit var voiceRecognizer: VoiceRecognizer
@@ -71,9 +83,8 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         val view = inflater!!.inflate(R.layout.fragment_new, container, false)
 
         val rvTask: RecyclerView = view.findViewById(R.id.rv_task)
-
         rvTask.layoutManager = LinearLayoutManager(view.context)
-        taskViewAdapter = TaskViewAdapter()
+        taskViewAdapter = TaskViewAdapter(this.taskApi)
         rvTask.adapter = taskViewAdapter
 
         messageInput = view.findViewById(R.id.input)
@@ -107,7 +118,7 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         messageInput.setInputListener(this)
         messageInput.setAudioInputListener(this)
 
-        updateData()
+        taskViewAdapter.updateData()
         return view
     }
 
@@ -253,9 +264,12 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
             this.taskApi.newTask(task, deadLine).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
                 if (it.success) {
-                    toast("添加任务成功")
+                    val txt = this.resources.getString(R.string.txt_task_add_success)
+                    toast(txt)
 
-                    updateData()
+                    taskViewAdapter.updateData()
+
+                    NewFragment.speaker.speak(txt)
 
                 } else {
                     Log.e(Constants.TAG_LOG, "添加任务失败 ${it.status?.description}")
@@ -269,26 +283,6 @@ class NewFragment : Fragment(), MessageInput.InputListener,
             }, {
 
             })
-        }
-    }
-
-
-    private fun updateData() {
-        this.taskApi.list(false).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
-            Log.d(Constants.TAG_LOG, "update data,result:$it")
-            if (it.success) {
-                taskViewAdapter.clear()
-                val tasks = it.data
-                Log.d(Constants.TAG_LOG, "tasks: ${tasks ?: "No tasks"}")
-                tasks?.let {
-                    it.forEach { task ->
-                        run {
-                            val taskDto = TaskDto(task.uid, task.content, task.deadLine)
-                            taskViewAdapter.addTask(taskDto)
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -321,68 +315,93 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         }
         voiceRecognizer.onClick()
     }
+}
+
+class TaskViewAdapter(val taskApi: TaskApi) : RecyclerView.Adapter<TaskViewHolder>() {
+
+    private var tasks: MutableList<TaskDto> = mutableListOf()
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.view_item_task, parent, false)
+        return TaskViewHolder(view, this)
+
+    }
+
+    override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
+
+        var deadLineStr: String? = null
+        tasks[position].deadLine?.let { deadLineStr = DateFormatter.format(Date(it.toLong()), "yyyy-MM-dd HH:mm:ss") }
+        holder.updateTask(tasks[position].uid, tasks[position].content, deadLineStr)
+    }
 
 
-    private class TaskViewAdapter : RecyclerView.Adapter<TaskViewAdapter.TaskViewHolder>() {
+    fun addTask(taskDto: TaskDto) {
+        this.tasks.add(taskDto)
+        notifyDataSetChanged()
+    }
 
-        private var tasks: MutableList<TaskDto> = mutableListOf()
+    fun clear() {
+        this.tasks.clear()
+        notifyDataSetChanged()
+    }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
+    override fun getItemCount(): Int {
+        return tasks.size
+    }
 
-            val view = LayoutInflater.from(parent.context).inflate(R.layout.view_item_task, parent, false)
-            return TaskViewHolder(view)
 
+    fun updateData() {
+        this.taskApi.list(false).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe {
+            Log.d(Constants.TAG_LOG, "update data,result:$it")
+            if (it.success) {
+                this.clear()
+                val tasks = it.data
+                Log.d(Constants.TAG_LOG, "tasks: ${tasks ?: "No tasks"}")
+                tasks?.let {
+                    it.forEach { task ->
+                        run {
+                            val taskDto = TaskDto(task.uid, task.content, task.deadLine)
+                            this.addTask(taskDto)
+                        }
+                    }
+                }
+            }
         }
-
-        override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-
-            var deadLineStr: String? = null
+    }
+}
 
 
-            tasks[position].deadLine?.let { deadLineStr = DateFormatter.format(Date(it.toLong()), "yyyy-MM-dd HH:mm:ss") }
+class TaskViewHolder(itemView: View, private val taskViewAdapter: TaskViewAdapter) : RecyclerView.ViewHolder(itemView) {
+    private val tvTask = itemView.findViewById<TextView>(R.id.tvTask)
+    private val tvDeadline = itemView.findViewById<TextView>(R.id.tvDeadline)
+    private val rbSelect = itemView.findViewById<RadioButton>(R.id.rbSelect)
+    private var taskId: String = ""
 
-
-            holder.updateTask(tasks[position].content, deadLineStr)
-
-
-        }
-
-
-        fun addTask(taskDto: TaskDto) {
-            this.tasks.add(taskDto)
-            notifyDataSetChanged()
-        }
-
-
-        fun clear() {
-            this.tasks.clear()
-            notifyDataSetChanged()
-        }
-
-        override fun getItemCount(): Int {
-            return tasks.size
-        }
-
-        inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-            val tvMsg: TextView = itemView.findViewById(R.id.tvMsg)
-
-        }
-
-        inner class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            private val tvTask = itemView.findViewById<TextView>(R.id.tvTask)
-            private val tvDeadline = itemView.findViewById<TextView>(R.id.tvDeadline)
-
-            fun updateTask(task: String, deadLine: String?) {
-                this.tvTask.text = task
-                this.tvDeadline.visibility = View.GONE
-                deadLine?.let { this.tvDeadline.text = it;this.tvDeadline.visibility = View.VISIBLE }
+    init {
+        rbSelect.isChecked = false
+        rbSelect.setOnClickListener {
+            taskViewAdapter.taskApi.finish(this.taskId).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                if (it.success) {
+                    NewFragment.speaker.speak("完成任务")
+                    this.taskViewAdapter.updateData()
+                }
             }
         }
     }
 
+    fun updateTask(uid: String, task: String, deadLine: String?) {
+        this.rbSelect.isChecked  = false
+        this.tvTask.text = task
+        this.taskId = uid
+        this.tvDeadline.visibility = View.GONE
+        deadLine?.let { this.tvDeadline.text = it;this.tvDeadline.visibility = View.VISIBLE }
+    }
+}
 
-}// Required empty public constructor
+
+// Required empty public constructor
 
 
 

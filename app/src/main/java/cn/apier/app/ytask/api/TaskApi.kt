@@ -16,4 +16,7 @@ interface TaskApi {
 
     @GET("/task/list")
     fun list(@Query("finished") finished: Boolean): Observable<Result<List<TaskDto>>>
+
+    @POST("/task/finish")
+    fun finish(@Query("uid") taskId: String): Observable<Result<Any>>
 }
