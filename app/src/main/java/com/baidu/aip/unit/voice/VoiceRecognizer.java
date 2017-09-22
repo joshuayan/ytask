@@ -19,7 +19,7 @@ import com.baidu.speech.VoiceRecognitionService;
 
 import java.util.ArrayList;
 
-import cn.apier.app.ytask.R;
+import cn.apier.ytask.R;
 
 public class VoiceRecognizer implements RecognitionListener {
     private static final String TAG = "Sdk2Api";

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.apier.app.ytask.R;
+import cn.apier.ytask.R;
 
 public class HintAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
