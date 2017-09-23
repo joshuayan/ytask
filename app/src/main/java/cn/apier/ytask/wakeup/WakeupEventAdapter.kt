@@ -10,11 +10,11 @@ import com.baidu.speech.EventListener
 
 class WakeupEventAdapter(private val listener: IWakeupListener) : EventListener {
 
-    override fun onEvent(name: String, params: String, data: ByteArray?, offset: Int, length: Int) {
+    override fun onEvent(name: String, params: String?, data: ByteArray?, offset: Int, length: Int) {
         // android studio日志Monitor 中搜索 WakeupEventAdapter即可看见下面一行的日志
-        Log.i(TAG, "wakeup name:$name; params:$params")
+        Log.i(TAG, "wakeup name:$name; params:${params?:""}")
         if (SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS.equals(name)) { //识别唤醒词成功
-            val result = WakeUpResult.parseJson(name, params)
+            val result = WakeUpResult.parseJson(name, params!!)
             val errorCode = result.errorCode
             if (result.hasError()) { // error不为0依旧有可能是异常情况
                 listener.onError(errorCode, ErrorTranslation.WakeupError(errorCode), result)
@@ -24,7 +24,7 @@ class WakeupEventAdapter(private val listener: IWakeupListener) : EventListener 
 
             }
         } else if (SpeechConstant.CALLBACK_EVENT_WAKEUP_ERROR.equals(name)) { // 识别唤醒词报错
-            val result = WakeUpResult.parseJson(name, params)
+            val result = WakeUpResult.parseJson(name, params!!)
             val errorCode = result.errorCode
             if (result.hasError()) {
                 listener.onError(errorCode, ErrorTranslation.WakeupError(errorCode), result)

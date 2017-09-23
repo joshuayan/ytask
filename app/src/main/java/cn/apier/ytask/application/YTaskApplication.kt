@@ -1,12 +1,22 @@
 package cn.apier.ytask.application
 
 import android.app.Application
+import android.os.Handler
+import android.os.Message
 import android.util.Log
 import cn.apier.ytask.R
 import cn.apier.ytask.api.UserApi
 import cn.apier.ytask.common.Constants
 import cn.apier.ytask.common.Utils
 import cn.apier.ytask.interceptor.RequestInterceptor
+import cn.apier.ytask.recognization.CommonRecogParams
+import cn.apier.ytask.recognization.MessageStatusRecogListener
+import cn.apier.ytask.recognization.MyRecognizer
+import cn.apier.ytask.synthesization.SynthesizerHelper
+import cn.apier.ytask.wakeup.MyWakeup
+import cn.apier.ytask.wakeup.SimpleWakeupListener
+import cn.apier.ytask.wakeup.WakeUpHelper
+import cn.apier.ytask.wakeup.WakeupParams
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
@@ -26,6 +36,21 @@ class YTaskApplication : Application() {
             private set
     }
 
+
+    lateinit var myRecognizer: MyRecognizer
+        private set
+
+
+    private val handler: Handler = object : Handler() {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+
+            processMsg(msg)
+        }
+    }
+    private var apiParams: CommonRecogParams = CommonRecogParams(this)
+
+
     private var debug: Boolean = false
 
     private lateinit var retrofit: Retrofit
@@ -36,16 +61,18 @@ class YTaskApplication : Application() {
     var signedUserId: String = ""
         private set
 
-
-    init {
-
-    }
-
     override fun onCreate() {
         super.onCreate()
         currentApplication = this
         debug = this.resources.getBoolean(R.bool.debug)
         retrofit = buildRetrofit()
+
+//        initWakeUp()
+//        startWakeUp()
+
+        //init synthesizer
+
+        WakeUpHelper.startWakeUp()
     }
 
 
@@ -97,4 +124,24 @@ class YTaskApplication : Application() {
     fun tokenExist(): Boolean = this.token != null
 
 
+    override fun onTerminate() {
+        WakeUpHelper.release()
+        super.onTerminate()
+    }
+
+
+    protected fun initRecog() {
+        val listener = MessageStatusRecogListener(handler)
+        myRecognizer = MyRecognizer(this, listener)
+//        apiParams = getApiParams()
+//        status = STATUS_NONE
+//        if (enableOffline) {
+//            myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())
+//        }
+    }
+
+    private fun processMsg(msg: Message) {
+
+        msg.obj?.let { toast("message:$it") }
+    }
 }

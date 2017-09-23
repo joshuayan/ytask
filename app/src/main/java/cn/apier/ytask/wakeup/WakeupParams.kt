@@ -10,7 +10,7 @@ import java.util.HashMap
  * Created by fujiayi on 2017/6/24.
  */
 
-class WakeupParams(context: Context) {
+class WakeupParams {
 
     private val TAG = "WakeupParams"
 

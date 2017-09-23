@@ -53,17 +53,7 @@
         <!-- 请填写应用实际的SECRET_KEY -->
         <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="iAEX4xSreMCcTp4hUzLHl4fzDrOjpCua"/>
         <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false" ></service>
-        <activity
-            android:name="com.baidu.voicerecognition.android.ui.BaiduASRDigitalDialog"
-            android:configChanges="orientation|keyboardHidden|screenLayout"
-            android:theme="@android:style/Theme.Dialog"
-            android:exported="false"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="com.baidu.action.RECOGNIZE_SPEECH" ></action>
-                <category android:name="android.intent.category.DEFAULT" ></category>
-            </intent-filter>
-        </activity>
+
     </application>
 
 </manifest>

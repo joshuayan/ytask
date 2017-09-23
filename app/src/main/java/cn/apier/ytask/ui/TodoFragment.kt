@@ -9,9 +9,12 @@ import android.view.ViewGroup
 import android.widget.Button
 
 import cn.apier.ytask.R
+import cn.apier.ytask.application.YTaskApplication
 import cn.apier.ytask.wakeup.MyWakeup
 import cn.apier.ytask.wakeup.SimpleWakeupListener
+import cn.apier.ytask.wakeup.WakeUpHelper
 import cn.apier.ytask.wakeup.WakeupParams
+import kotlin.concurrent.thread
 
 /**
  * A fragment representing a list of Items.
@@ -26,10 +29,10 @@ import cn.apier.ytask.wakeup.WakeupParams
  */
 class TodoFragment : Fragment() {
 
-    private lateinit var myWakeup: MyWakeup
+//    private lateinit var myWakeup: MyWakeup
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initWakeUp()
+//        initWakeUp()
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -41,20 +44,19 @@ class TodoFragment : Fragment() {
             start()
         }
 
+
         val btnStop = view.findViewById<Button>(R.id.btnStop)
 
         btnStop.setOnClickListener {
 
-            myWakeup.stop()
         }
 
         return view
     }
 
     private fun start() {
-        val wakeupParams = WakeupParams(this.activity)
-        val params = wakeupParams.fetch()
-        myWakeup.start(params)
+
+        WakeUpHelper.startWakeUp()
     }
 
     override fun onAttach(context: Context?) {
@@ -70,16 +72,5 @@ class TodoFragment : Fragment() {
         super.onDetach()
     }
 
-
-    private fun initWakeUp() {
-        val listener = SimpleWakeupListener()
-        myWakeup = MyWakeup(this.activity, listener)
-    }
-
-
-    override fun onDestroy() {
-        myWakeup.release()
-        super.onDestroy()
-    }
 
 }
