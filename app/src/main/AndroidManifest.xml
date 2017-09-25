@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="cn.apier.ytask">
+    package="cn.apier.app.ytask">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"   />
@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
 
     <application
         android:name=".application.YTaskApplication"
@@ -47,11 +50,11 @@
 
         <!-- begin: baidu speech sdk-->
         <!-- 请填写应用实际的APP_ID -->
-        <meta-data android:name="com.baidu.speech.APP_ID" android:value="10130761"/>
+        <meta-data android:name="com.baidu.speech.APP_ID" android:value="10181832"/>
         <!-- 请填写应用实际的API_KEY -->
-        <meta-data android:name="com.baidu.speech.API_KEY" android:value="ILo4xDbLmdmIE7peI60cec3n"/>
+        <meta-data android:name="com.baidu.speech.API_KEY" android:value="vOZBNK7pdOp3o22QodOcT3TO"/>
         <!-- 请填写应用实际的SECRET_KEY -->
-        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="iAEX4xSreMCcTp4hUzLHl4fzDrOjpCua"/>
+        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="dqNhbo876W7mGGPVTRVOa5LMe2YbYVEp"/>
         <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false" ></service>
 
     </application>
