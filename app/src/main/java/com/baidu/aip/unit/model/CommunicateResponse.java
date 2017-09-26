@@ -10,16 +10,6 @@ import java.util.Objects;
 
 public class CommunicateResponse extends ResponseResult {
 
-
-    public class Result {
-        public Schema schema;
-        public List<Action> actionList = new ArrayList<>();
-
-        public String sessionId;
-
-    }
-
-
     public static class Action {
         public String actionId;
         public ActionType actionType;

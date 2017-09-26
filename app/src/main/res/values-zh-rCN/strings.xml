@@ -10,4 +10,6 @@
     <string name="hint_all_in_one_input">请输入指令</string>
     <string name="hint_new_input">请输入任务信息</string>
     <string name="txt_task_add_success">添加任务成功</string>
+    <string name="title_task_list">任务列表</string>
+    <string name="txt_task_add_fail">添加任务失败</string>
 </resources>

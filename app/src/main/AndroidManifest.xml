@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.apier.app.ytask">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"   />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-
 
     <application
         android:name=".application.YTaskApplication"
@@ -45,17 +44,32 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.task.ListTaskActivity"
+            android:label="@string/title_task_list">
+            <intent-filter>
+                <category android:name="cn.apier.app.ytask.TASK" />
+                <action android:name="cn.apier.app.ytask.TASK_LIST" />
+            </intent-filter>
+        </activity>
 
-
-
-        <!-- begin: baidu speech sdk-->
+        <!-- begin: baidu speech sdk -->
         <!-- 请填写应用实际的APP_ID -->
-        <meta-data android:name="com.baidu.speech.APP_ID" android:value="10181832"/>
+        <meta-data
+            android:name="com.baidu.speech.APP_ID"
+            android:value="10181832" />
         <!-- 请填写应用实际的API_KEY -->
-        <meta-data android:name="com.baidu.speech.API_KEY" android:value="vOZBNK7pdOp3o22QodOcT3TO"/>
+        <meta-data
+            android:name="com.baidu.speech.API_KEY"
+            android:value="vOZBNK7pdOp3o22QodOcT3TO" />
         <!-- 请填写应用实际的SECRET_KEY -->
-        <meta-data android:name="com.baidu.speech.SECRET_KEY" android:value="dqNhbo876W7mGGPVTRVOa5LMe2YbYVEp"/>
-        <service android:name="com.baidu.speech.VoiceRecognitionService" android:exported="false" ></service>
+        <meta-data
+            android:name="com.baidu.speech.SECRET_KEY"
+            android:value="dqNhbo876W7mGGPVTRVOa5LMe2YbYVEp" />
+
+        <service
+            android:name="com.baidu.speech.VoiceRecognitionService"
+            android:exported="false" />
 
     </application>
 

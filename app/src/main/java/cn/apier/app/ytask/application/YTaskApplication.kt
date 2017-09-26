@@ -1,10 +1,12 @@
 package cn.apier.app.ytask.application
 
+import android.app.Activity
 import android.app.Application
 import android.os.Handler
 import android.os.Message
 import android.util.Log
 import cn.apier.app.ytask.R
+import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.common.Utils
@@ -12,6 +14,8 @@ import cn.apier.app.ytask.interceptor.RequestInterceptor
 import cn.apier.app.ytask.recognization.CommonRecogParams
 import cn.apier.app.ytask.recognization.MessageStatusRecogListener
 import cn.apier.app.ytask.recognization.MyRecognizer
+import cn.apier.app.ytask.scene.SceneActionDispatcher
+import cn.apier.app.ytask.scene.processor.AddTaskProcessor
 import cn.apier.app.ytask.wakeup.WakeUpHelper
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
@@ -30,10 +34,12 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 class YTaskApplication : Application() {
 
+    var currentActivity: Activity? = null
 
     companion object {
         lateinit var currentApplication: YTaskApplication
             private set
+        private val TAG = YTaskApplication.javaClass.simpleName
     }
 
 
@@ -61,10 +67,16 @@ class YTaskApplication : Application() {
     var signedUserId: String = ""
         private set
 
+
+    init {
+        SceneActionDispatcher.addProcessor(AddTaskProcessor())
+    }
+
     override fun onCreate() {
         super.onCreate()
         currentApplication = this
         debug = this.resources.getBoolean(R.bool.debug)
+        ApiFactory.debug = debug
         retrofit = buildRetrofit()
 
 
@@ -102,11 +114,11 @@ class YTaskApplication : Application() {
         this.apiProxy(UserApi::class.java).getToken(Constants.appKey(this.debug), timestampInMs, sign(timestampInMs)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 {
 
-                    Log.d("ytask", it.toString())
+                    Log.d(TAG, it.toString())
                     if (it.success) {
                         val tokenDto = it.data
                         this.token = tokenDto?.code ?: ""
-                        Log.d("ytask", "token:${token}")
+                        Log.d(TAG, "token:${token}")
 
                         successFun()
 
@@ -158,12 +170,12 @@ class YTaskApplication : Application() {
             APIService.getInstance().initAccessToken(object : OnResultListener<AccessToken> {
                 override fun onResult(result: AccessToken) {
                     val accessToken = result.accessToken
-                    Log.i("YTaskApplication", "AccessToken->" + result.accessToken)
+                    Log.i(TAG, "BD AccessToken->" + result.accessToken)
                     this@YTaskApplication.bdToken = accessToken
                 }
 
                 override fun onError(error: UnitError) {
-                    Log.i("wtf", "AccessToken->" + error.errorMessage)
+                    Log.i(TAG, "BD AccessToken->" + error.errorMessage)
                 }
             }, it.data?.appKey, it.data?.secretKey)
         }

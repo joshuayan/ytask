@@ -76,6 +76,8 @@ class SignInActivity : AppCompatActivity() {
 
         }
 
+        YTaskApplication.currentApplication.currentActivity = this
+
     }
 
     private fun gotoMain() {

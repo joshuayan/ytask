@@ -3,11 +3,14 @@
  */
 package com.baidu.aip.unit.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ResponseResult {
 
 
     private long logId;
-    public CommunicateResponse.Result result;
+    public Result result;
 
     public long getLogId() {
         return logId;
@@ -25,5 +28,15 @@ public class ResponseResult {
 
     public void setJsonRes(String jsonRes) {
         this.jsonRes = jsonRes;
+    }
+
+
+
+    public class Result {
+        public CommunicateResponse.Schema schema;
+        public List<CommunicateResponse.Action> actionList = new ArrayList<>();
+
+        public String sessionId;
+
     }
 }

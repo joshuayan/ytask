@@ -10,8 +10,6 @@
     <string name="err_password_required">Password required</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="err_get_token_failed">Failed to get token</string>
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
 
@@ -21,4 +19,7 @@
     <string name="hint_new_input">Input message</string>
     <bool name="debug">false</bool>
     <string name="txt_task_add_success">Add task successfully</string>
+    <string name="title_activity_list_task">任务列表</string>
+    <string name="title_task_list">Task List</string>
+    <string name="txt_task_add_fail">Failed to add task</string>
 </resources>

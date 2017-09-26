@@ -94,7 +94,7 @@ object SynthesizerHelper {
         }
 
         override fun onError(p0: String?, p1: SpeechError?) {
-            Log.d(Constants.TAG_LOG, "onError")
+            Log.d(Constants.TAG_LOG, "onError：${p1?.code},${p1?.description}")
         }
     }
 }
