@@ -2,6 +2,7 @@ package cn.apier.app.ytask.unit
 
 import android.text.TextUtils
 import android.util.Log
+import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
@@ -24,7 +25,7 @@ object UnitHelper {
     private var sessionId: String = ""
     private var mid: Long = 1L
     private val sender: User = User("1", "joshua", "Joshua Yan", true)
-    private val taskApi: TaskApi = YTaskApplication.currentApplication.apiProxy(TaskApi::class.java)
+    private val taskApi: TaskApi = ApiFactory.apiProxy(TaskApi::class.java)
 
 
     fun understand(txt: String) {

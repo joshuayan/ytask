@@ -43,12 +43,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".ui.task.ListTaskActivity"
+            android:name=".ui.task.TaskListActivity"
             android:label="@string/title_task_list">
             <intent-filter>
                 <category android:name="cn.apier.app.ytask.TASK" />
+
                 <action android:name="cn.apier.app.ytask.TASK_LIST" />
             </intent-filter>
         </activity>
@@ -71,6 +71,7 @@
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />
 
+        <activity android:name=".ui.task.TaskAlarmActivity"></activity>
     </application>
 
 </manifest>

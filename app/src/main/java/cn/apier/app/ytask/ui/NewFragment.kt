@@ -19,6 +19,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.RadioButton
 import android.widget.TextView
 import cn.apier.app.ytask.R
+import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
@@ -48,7 +49,7 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     private lateinit var voiceRecognizer: VoiceRecognizer
     private var mid: Int = 0
-    private val taskApi: TaskApi = YTaskApplication.currentApplication.apiProxy(TaskApi::class.java)
+    private val taskApi: TaskApi = ApiFactory.apiProxy(TaskApi::class.java)
 
 
     private lateinit var messageInput: MessageInput

@@ -12,6 +12,7 @@ import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
+import cn.apier.app.ytask.ui.base.BaseActivity
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
@@ -24,42 +25,39 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : FragmentActivity(), SpeechSynthesizerListener {
+class MainActivity : BaseActivity(), SpeechSynthesizerListener {
     override fun onSynthesizeStart(p0: String?) {
-        Log.d(Constants.TAG_LOG,"onSynthesizeStart")
+        Log.d(Constants.TAG_LOG, "onSynthesizeStart")
     }
 
     override fun onSpeechFinish(p0: String?) {
-        Log.d(Constants.TAG_LOG,"onSpeechFinish")
+        Log.d(Constants.TAG_LOG, "onSpeechFinish")
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {
-        Log.d(Constants.TAG_LOG,"onSpeechProgressChanged")
+        Log.d(Constants.TAG_LOG, "onSpeechProgressChanged")
     }
 
     override fun onSynthesizeFinish(p0: String?) {
-        Log.d(Constants.TAG_LOG,"onSynthesizeFinish")
+        Log.d(Constants.TAG_LOG, "onSynthesizeFinish")
     }
 
     override fun onSpeechStart(p0: String?) {
-        Log.d(Constants.TAG_LOG,"onSpeechStart")
+        Log.d(Constants.TAG_LOG, "onSpeechStart")
     }
 
     override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int) {
-        Log.d(Constants.TAG_LOG,"onSynthesizeDataArrived")
+        Log.d(Constants.TAG_LOG, "onSynthesizeDataArrived")
     }
 
     override fun onError(p0: String?, p1: SpeechError?) {
-        Log.d(Constants.TAG_LOG,"onError")
+        Log.d(Constants.TAG_LOG, "onError")
     }
 
     private var todoFragment: TodoFragment? = null
     private var newFragment: NewFragment? = null
     private var finishedFragment: FinishedFragment? = null
 
-    private val speechSynthesizer = SpeechSynthesizer.getInstance()
-
-    private lateinit var yTaskApplication: YTaskApplication
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         switchTab(item.itemId)
@@ -75,15 +73,7 @@ class MainActivity : FragmentActivity(), SpeechSynthesizerListener {
         fragmentTrans.commit()
         nv_main.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        this.yTaskApplication = this.getApplication() as YTaskApplication
-
-//        initAccessToken()
-
-//        initSpeech()
-
     }
-
-
 
 
     private fun switchTab(itemId: Int) {

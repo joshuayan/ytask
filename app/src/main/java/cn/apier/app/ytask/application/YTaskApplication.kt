@@ -2,6 +2,7 @@ package cn.apier.app.ytask.application
 
 import android.app.Activity
 import android.app.Application
+import android.content.Intent
 import android.os.Handler
 import android.os.Message
 import android.util.Log
@@ -54,12 +55,9 @@ class YTaskApplication : Application() {
             processMsg(msg)
         }
     }
-    private var apiParams: CommonRecogParams = CommonRecogParams(this)
-
 
     private var debug: Boolean = false
 
-    private lateinit var retrofit: Retrofit
     var bdToken: String? = null
     var token: String? = null
     var signedIn: Boolean = false
@@ -77,41 +75,19 @@ class YTaskApplication : Application() {
         currentApplication = this
         debug = this.resources.getBoolean(R.bool.debug)
         ApiFactory.debug = debug
-        retrofit = buildRetrofit()
-
 
         initToken { initBDToken() }
 
-
-//        initWakeUp()
-//        startWakeUp()
-
         //init synthesizer
-
-        WakeUpHelper.startWakeUp()
     }
 
-
-    fun <T : Any> apiProxy(clazz: Class<T>): T = this.retrofit.create(clazz)
-
-
-    private fun buildRetrofit(): Retrofit {
-        val client = OkHttpClient.Builder().addInterceptor(RequestInterceptor()).build()
-
-
-        return Retrofit.Builder().baseUrl(Constants.baseUrl(this.debug))
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .client(client)
-                .build()
-    }
 
     private fun sign(timestampInMs: String): String = Utils.md5(Constants.appKey(this.debug) + Constants.secretKey(this.debug) + timestampInMs) ?: ""
 
 
     private fun initToken(successFun: () -> Unit = {}) {
         val timestampInMs = "${System.currentTimeMillis()}"
-        this.apiProxy(UserApi::class.java).getToken(Constants.appKey(this.debug), timestampInMs, sign(timestampInMs)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+        ApiFactory.apiProxy(UserApi::class.java).getToken(Constants.appKey(this.debug), timestampInMs, sign(timestampInMs)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 {
 
                     Log.d(TAG, it.toString())
@@ -131,6 +107,9 @@ class YTaskApplication : Application() {
                 })
     }
 
+    override fun startActivity(intent: Intent?) {
+        super.startActivity(intent)
+    }
 
     fun signedIn(userId: String) {
         this.signedIn = true
@@ -145,27 +124,15 @@ class YTaskApplication : Application() {
         super.onTerminate()
     }
 
-
-    protected fun initRecog() {
-        val listener = MessageStatusRecogListener(handler)
-        myRecognizer = MyRecognizer(this, listener)
-//        apiParams = getApiParams()
-//        status = STATUS_NONE
-//        if (enableOffline) {
-//            myRecognizer.loadOfflineEngine(OfflineRecogParams.fetchOfflineParams())
-//        }
-    }
-
     private fun processMsg(msg: Message) {
 
         msg.obj?.let { toast("message:$it") }
     }
 
-
     private fun initBDToken() {
 
         APIService.getInstance().init(applicationContext)
-        this.apiProxy(UserApi::class.java).queryBDApplicationInfo().subscribeOn(Schedulers.io()).subscribe {
+        ApiFactory.apiProxy(UserApi::class.java).queryBDApplicationInfo().subscribeOn(Schedulers.io()).subscribe {
 
             APIService.getInstance().initAccessToken(object : OnResultListener<AccessToken> {
                 override fun onResult(result: AccessToken) {

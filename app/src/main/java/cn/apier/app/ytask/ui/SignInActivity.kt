@@ -10,8 +10,11 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import cn.apier.app.ytask.R
+import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
+import cn.apier.app.ytask.ui.base.BaseActivity
+import cn.apier.app.ytask.wakeup.WakeUpHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.find
@@ -20,7 +23,7 @@ import org.jetbrains.anko.toast
 /**
  * Created by yanjunhua on 2017/9/5.
  */
-class SignInActivity : AppCompatActivity() {
+class SignInActivity : BaseActivity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +61,7 @@ class SignInActivity : AppCompatActivity() {
 
 
             val application = this.application as YTaskApplication
-            application.apiProxy(UserApi::class.java).signIn(mobile, password).subscribeOn(Schedulers.io())
+            ApiFactory.apiProxy(UserApi::class.java).signIn(mobile, password).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe { result ->
                 Log.d("ytask", result.toString())
                 if (result.success) {
@@ -72,15 +75,12 @@ class SignInActivity : AppCompatActivity() {
                     it.isEnabled = true
                 }
             }
-
-
         }
-
-        YTaskApplication.currentApplication.currentActivity = this
 
     }
 
     private fun gotoMain() {
+        WakeUpHelper.startWakeUp()
         val intent = Intent(this.applicationContext, MainActivity::class.java)
         startActivity(intent)
         this.finish()
