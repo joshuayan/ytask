@@ -1,5 +1,6 @@
 package cn.apier.app.ytask.scene
 
+import android.util.Log
 import cn.apier.app.ytask.scene.processor.SceneActionProcessor
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import com.baidu.aip.unit.model.CommunicateResponse
@@ -9,6 +10,7 @@ import com.baidu.aip.unit.model.CommunicateResponse
  */
 object SceneActionDispatcher {
 
+    private val TAG = SceneActionDispatcher::class.java.simpleName
     private val processors: MutableList<SceneActionProcessor> = mutableListOf()
 
     fun dispatch(unitSceneResponseResult: CommunicateResponse) {
@@ -24,7 +26,10 @@ object SceneActionDispatcher {
                 }
             }
 
-            if (!processed) SynthesizerHelper.speak("我还不懂你说的话")
+            if (!processed) {
+                Log.w(TAG, "Unknown action: $actionId")
+                SynthesizerHelper.speak("我还不懂你说的话")
+            }
         }
     }
 
