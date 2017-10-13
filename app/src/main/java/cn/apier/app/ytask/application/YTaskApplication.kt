@@ -12,16 +12,19 @@ import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.common.Utils
 import cn.apier.app.ytask.interceptor.RequestInterceptor
+import cn.apier.app.ytask.recognization.BDRecognizerHelper
 import cn.apier.app.ytask.recognization.CommonRecogParams
 import cn.apier.app.ytask.recognization.MessageStatusRecogListener
 import cn.apier.app.ytask.recognization.MyRecognizer
 import cn.apier.app.ytask.scene.SceneActionDispatcher
 import cn.apier.app.ytask.scene.processor.AddTaskProcessor
+import cn.apier.app.ytask.ui.base.BaseActivity
 import cn.apier.app.ytask.wakeup.WakeUpHelper
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
 import com.baidu.aip.unit.model.AccessToken
+import com.iflytek.cloud.SpeechUtility
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.OkHttpClient
@@ -35,7 +38,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 class YTaskApplication : Application() {
 
-    var currentActivity: Activity? = null
+    var currentActivity: BaseActivity? = null
 
     companion object {
         lateinit var currentApplication: YTaskApplication
@@ -43,18 +46,6 @@ class YTaskApplication : Application() {
         private val TAG = YTaskApplication.javaClass.simpleName
     }
 
-
-    lateinit var myRecognizer: MyRecognizer
-        private set
-
-
-    private val handler: Handler = object : Handler() {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-
-            processMsg(msg)
-        }
-    }
 
     private var debug: Boolean = false
 
@@ -78,9 +69,15 @@ class YTaskApplication : Application() {
 
         initToken { initBDToken() }
 
+        initAIUI()
         //init synthesizer
     }
 
+
+    private fun initAIUI() {
+        SpeechUtility.createUtility(this, "appid=" + Constants.AIUI_APP_ID);
+
+    }
 
     private fun sign(timestampInMs: String): String = Utils.md5(Constants.appKey(this.debug) + Constants.secretKey(this.debug) + timestampInMs) ?: ""
 
@@ -107,7 +104,10 @@ class YTaskApplication : Application() {
                 })
     }
 
-    override fun startActivity(intent: Intent?) {
+    override fun startActivity(intent: Intent) {
+//        super.startActivity(intent)
+
+        this.currentActivity?.finish()
         super.startActivity(intent)
     }
 
@@ -148,4 +148,7 @@ class YTaskApplication : Application() {
         }
     }
 
+    fun startWakeUp() {
+        WakeUpHelper.startWakeUp({ BDRecognizerHelper.start() })
+    }
 }

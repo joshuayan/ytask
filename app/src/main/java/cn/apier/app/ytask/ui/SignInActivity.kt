@@ -80,7 +80,7 @@ class SignInActivity : BaseActivity() {
     }
 
     private fun gotoMain() {
-        WakeUpHelper.startWakeUp()
+        YTaskApplication.currentApplication.startWakeUp()
         val intent = Intent(this.applicationContext, MainActivity::class.java)
         startActivity(intent)
         this.finish()

@@ -46,7 +46,7 @@ object UnitHelper {
     private fun handleResponse(response: CommunicateResponse?) {
         response?.let {
 
-            Log.d(Constants.TAG_LOG, "unit response :$it")
+            Log.i(Constants.TAG_LOG, "unit response :$it")
 
             SceneActionDispatcher.dispatch(response)
 

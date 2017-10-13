@@ -3,6 +3,7 @@ package cn.apier.app.ytask.scene
 import android.util.Log
 import cn.apier.app.ytask.scene.processor.SceneActionProcessor
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
+import cn.apier.app.ytask.xunfei.AIUIHelper
 import com.baidu.aip.unit.model.CommunicateResponse
 
 /**
@@ -28,7 +29,9 @@ object SceneActionDispatcher {
 
             if (!processed) {
                 Log.w(TAG, "Unknown action: $actionId")
-                SynthesizerHelper.speak("我还不懂你说的话")
+
+
+//                SynthesizerHelper.speak("我还不懂你说的话")
             }
         }
     }

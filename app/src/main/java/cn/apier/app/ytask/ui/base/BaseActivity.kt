@@ -19,4 +19,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
    open fun refresh() {}
+
+
+
 }

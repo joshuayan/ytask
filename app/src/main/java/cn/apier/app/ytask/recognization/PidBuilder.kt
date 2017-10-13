@@ -139,5 +139,9 @@ class PidBuilder {
             val key = lang + "_" + onlineModel + "_" + if (nlu) 1 else 0
             map!!.put(key, pid)
         }
+
+        fun create(): PidBuilder {
+            return PidBuilder()
+        }
     }
 }

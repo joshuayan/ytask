@@ -17,6 +17,8 @@ object Constants {
     const val SLOT_TODO = "user_todo"
     const val SLOT_CMD = "user_cmd"
 
+    const val AIUI_APP_ID="59ad650c"
+
     const val CMD_ADD_TASK = "添加任务"
 
     fun baseUrl(debug: Boolean) = if (debug) TEST_BASE_URL else BASE_URL

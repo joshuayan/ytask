@@ -12,14 +12,18 @@ import org.jetbrains.anko.toast
 /**
  * Created by yanjunhua on 2017/9/23.
  */
-object RecognizerHelper {
+object BDRecognizerHelper {
+
 
     private val handler = object : Handler() {
-        override fun handleMessage(msg: Message?) {
+        override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             processMsg(msg)
         }
     }
+
+    var result: String = ""
+        private set
     private val listener = MessageStatusRecogListener(handler)
     private val myRecognizer: MyRecognizer = MyRecognizer(YTaskApplication.currentApplication, listener)
 
@@ -30,15 +34,15 @@ object RecognizerHelper {
         val sp = PreferenceManager.getDefaultSharedPreferences(YTaskApplication.currentApplication)
         val params = AllRecogParams(YTaskApplication.currentApplication).fetch(sp)
         val pidParams = mutableMapOf<String, Any>()
+
         pidParams.putAll(params)
-        pidParams.put("PID", 15361)
+        pidParams.put("pid", 15361)
         this.myRecognizer.start(pidParams)
     }
 
-    private fun processMsg(msg: Message?) {
-        msg?.let {
-            //            YTaskApplication.currentApplication.toast("识别结果：${it.obj}")
-            Log.i(Constants.TAG_LOG, "识别结果：${it.obj}")
+    private fun processMsg(msg: Message) {
+        when (msg.what) {
+            0 -> this.result = msg.obj as String
         }
     }
 

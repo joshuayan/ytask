@@ -2,10 +2,7 @@ package cn.apier.app.ytask.recognization
 
 import android.os.Handler
 import android.os.Message
-import android.util.Log
-import cn.apier.app.ytask.common.Constants
-import cn.apier.app.ytask.scene.SceneActionDispatcher
-import cn.apier.app.ytask.unit.UnitHelper
+import cn.apier.app.ytask.xunfei.AIUIHelper
 
 /**
  * Created by fujiayi on 2017/6/16.
@@ -45,19 +42,26 @@ class MessageStatusRecogListener(private val handler: Handler) : StatusRecogList
         val recognitionResult: String? = results[0]
 
 
-        recognitionResult?.let { UnitHelper.understand(it) }
-
-
-        var message = "识别结束，结果是”" + results[0] + "”"
-        sendStatusMessage(message + "“；原始json：" + recogResult.origalJson)
-        if (speechEndTime > 0) {
-            val diffTime = System.currentTimeMillis() - speechEndTime
-            message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
-
+        recognitionResult?.let {
+            val message = Message.obtain()
+            message.what = 0
+            message.obj = recognitionResult
+            handler.sendMessage(message)
+            //            UnitHelper.understand(it)
+            AIUIHelper.understand(it)
         }
-        speechEndTime = 0
-        Log.d(Constants.TAG_LOG, "识别结束，结果：${results[0]},发送消息")
-        sendMessage(message, status, true)
+
+
+//        var message = "识别结束，结果是”" + results[0] + "”"
+//        sendStatusMessage(message + "“；原始json：" + recogResult.origalJson)
+//        if (speechEndTime > 0) {
+//            val diffTime = System.currentTimeMillis() - speechEndTime
+//            message += "；说话结束到识别结束耗时【" + diffTime + "ms】"
+//
+//        }
+//        speechEndTime = 0
+//        Log.d(Constants.TAG_LOG, "识别结束，结果：${results[0]},发送消息")
+//        sendMessage(message, status, true)
     }
 
     override fun onAsrFinishError(errorCode: Int, errorMessage: String, descMessage: String) {

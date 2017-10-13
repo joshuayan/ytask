@@ -7,21 +7,21 @@ import cn.apier.app.ytask.application.YTaskApplication
  */
 object WakeUpHelper {
 
-    private val myWakeUp: MyWakeup
+    private var listener = SimpleWakeupListener()
+    private val myWakeUp: MyWakeup = MyWakeup(YTaskApplication.currentApplication, listener)
 
-    init {
-        val listener = SimpleWakeupListener()
-        this.myWakeUp = MyWakeup(YTaskApplication.currentApplication, listener)
-    }
-
-    fun startWakeUp() {
+    fun startWakeUp(onSuccess: () -> Unit = {}) {
         val wakeupParams = WakeupParams()
         val params = wakeupParams.fetch()
+        listener.onWakeUpSuccess = onSuccess
         myWakeUp.start(params)
+    }
+
+    fun stop() {
+        this.myWakeUp.stop()
     }
 
     fun release() {
         this.myWakeUp.release()
     }
-
 }

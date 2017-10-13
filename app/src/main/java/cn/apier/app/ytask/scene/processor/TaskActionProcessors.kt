@@ -53,15 +53,13 @@ class AddTaskProcessor : SceneActionProcessor {
 //                listIntent.addCategory(TaskActivityFilters.CATEGORY_TASK)
                 val listIntent = Intent(YTaskApplication.currentApplication.currentActivity, TaskListActivity::class.java)
 
-                YTaskApplication.currentApplication.currentActivity?.startActivity(listIntent)
+                YTaskApplication.currentApplication.startActivity(listIntent)
 
             } else {
                 Log.i(this.javaClass.simpleName, "Can not process action [${action.actionId}]")
             }
-
         }
     }
-
 
     private fun handleBusiness(result: ResponseResult.Result) {
         if (result.schema != null) {
