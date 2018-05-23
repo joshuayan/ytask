@@ -3,13 +3,13 @@
  */
 package com.baidu.aip.unit.utils;
 
-import android.util.Base64;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+
+import android.util.Base64;
 
 public class FileBase64Encoder {
     public void setInputFile(File file) throws FileNotFoundException {

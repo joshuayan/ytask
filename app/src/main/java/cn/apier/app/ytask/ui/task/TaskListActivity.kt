@@ -79,8 +79,6 @@ class TaskListActivity : BaseActivity() {
                 Log.w(TAG, "Unknown Message")
             }
         }
-
-
         true
     })
 
@@ -151,12 +149,11 @@ class TaskListActivity : BaseActivity() {
             this.tvTask.text = task
             this.taskId = uid
             this.tvDeadline.visibility = View.GONE
+            this.tvTask.textColor = oldColor
             deadLine?.let {
                 this.tvDeadline.text = DateFormatter.format(it, "yyyy-MM-dd HH:mm:ss");this.tvDeadline.visibility = View.VISIBLE
                 if (System.currentTimeMillis() > deadLine.time) {
                     this.tvTask.textColor = Color.RED
-                } else {
-                    this.tvTask.textColor = oldColor
                 }
             }
 

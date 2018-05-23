@@ -7,7 +7,6 @@ import android.util.Log
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.recognization.all.AllRecogParams
-import org.jetbrains.anko.toast
 
 /**
  * Created by yanjunhua on 2017/9/23.

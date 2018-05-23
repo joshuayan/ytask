@@ -3,7 +3,6 @@ package cn.apier.app.ytask.wakeup
 import android.util.Log
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
-import cn.apier.app.ytask.recognization.BDRecognizerHelper
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import org.jetbrains.anko.toast
 

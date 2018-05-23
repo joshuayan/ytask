@@ -1,9 +1,7 @@
 package cn.apier.app.ytask.application
 
-import android.app.Activity
 import android.app.Application
 import android.content.Intent
-import android.os.Handler
 import android.os.Message
 import android.util.Log
 import cn.apier.app.ytask.R
@@ -11,27 +9,20 @@ import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.common.Utils
-import cn.apier.app.ytask.interceptor.RequestInterceptor
 import cn.apier.app.ytask.recognization.BDRecognizerHelper
-import cn.apier.app.ytask.recognization.CommonRecogParams
-import cn.apier.app.ytask.recognization.MessageStatusRecogListener
-import cn.apier.app.ytask.recognization.MyRecognizer
 import cn.apier.app.ytask.scene.SceneActionDispatcher
+import cn.apier.app.ytask.scene.SceneActions
 import cn.apier.app.ytask.scene.processor.AddTaskProcessor
+import cn.apier.app.ytask.scene.processor.ListTaskProcessor
 import cn.apier.app.ytask.ui.base.BaseActivity
 import cn.apier.app.ytask.wakeup.WakeUpHelper
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
 import com.baidu.aip.unit.model.AccessToken
-import com.iflytek.cloud.SpeechUtility
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import okhttp3.OkHttpClient
 import org.jetbrains.anko.toast
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 
 /**
  * Created by yanjunhua on 2017/9/5.
@@ -58,7 +49,8 @@ class YTaskApplication : Application() {
 
 
     init {
-        SceneActionDispatcher.addProcessor(AddTaskProcessor())
+        SceneActionDispatcher.addProcessor(SceneActions.ACTION_ADD_TASK, AddTaskProcessor())
+        SceneActionDispatcher.addProcessor(SceneActions.ACTION_LIST_TASK, ListTaskProcessor())
     }
 
     override fun onCreate() {
@@ -75,7 +67,7 @@ class YTaskApplication : Application() {
 
 
     private fun initAIUI() {
-        SpeechUtility.createUtility(this, "appid=" + Constants.AIUI_APP_ID);
+//        SpeechUtility.createUtility(this, "appid=" + Constants.AIUI_APP_ID);
 
     }
 
@@ -107,8 +99,13 @@ class YTaskApplication : Application() {
     override fun startActivity(intent: Intent) {
 //        super.startActivity(intent)
 
-        this.currentActivity?.finish()
-        super.startActivity(intent)
+        this.currentActivity?.let {
+            if (!it.daemonActivity()) {
+                it.finish()
+            }
+            it.startActivity(intent)
+
+        }
     }
 
     fun signedIn(userId: String) {

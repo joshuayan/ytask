@@ -1,8 +1,7 @@
 package cn.apier.app.ytask.recognization
 
 import com.baidu.speech.asr.SpeechConstant
-
-import java.util.HashMap
+import java.util.*
 
 /**
  * 根据语言， 长短句模型和是否需要语义功能 生成对应PID

@@ -1,12 +1,10 @@
 package cn.apier.app.ytask.recognization.online
 
+
 import android.app.Activity
-
-
+import cn.apier.app.ytask.util.Logger
 import java.io.IOException
 import java.io.InputStream
-
-import cn.apier.app.ytask.util.Logger
 
 /**
  * Created by fujiayi on 2017/6/20.

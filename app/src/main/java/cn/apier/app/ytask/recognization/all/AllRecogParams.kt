@@ -2,13 +2,10 @@ package cn.apier.app.ytask.recognization.all
 
 import android.content.Context
 import android.content.SharedPreferences
-
-import com.baidu.speech.asr.SpeechConstant
-
-import java.util.Arrays
-
 import cn.apier.app.ytask.recognization.CommonRecogParams
 import cn.apier.app.ytask.recognization.PidBuilder
+import com.baidu.speech.asr.SpeechConstant
+import java.util.*
 
 /**
  * Created by fujiayi on 2017/6/24.

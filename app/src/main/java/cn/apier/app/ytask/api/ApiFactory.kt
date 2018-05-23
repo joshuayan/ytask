@@ -1,13 +1,11 @@
 package cn.apier.app.ytask.api
 
-import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.interceptor.RequestInterceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import java.lang.ref.WeakReference
 
 /**
  * Created by yanjunhua on 2017/9/26.

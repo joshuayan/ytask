@@ -3,16 +3,11 @@ package cn.apier.app.ytask.recognization
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Environment
-
-import com.baidu.speech.asr.SpeechConstant
-
-import java.util.ArrayList
-import java.util.Arrays
-import java.util.HashMap
-
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.util.FileUtil
 import cn.apier.app.ytask.util.Logger
+import com.baidu.speech.asr.SpeechConstant
+import java.util.*
 
 /**
  * Created by fujiayi on 2017/6/20.

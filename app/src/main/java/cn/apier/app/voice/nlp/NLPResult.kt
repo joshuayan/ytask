@@ -1,4 +1,4 @@
-package cn.apier.app.voice
+package cn.apier.app.voice.nlp
 
 /**
  * Created by yanjunhua on 2017/9/28.
@@ -22,4 +22,4 @@ class NLPResult(val success: Boolean, val originalText: String) {
 }
 
 
-data class NLPSlotItem(val type: String, val normalizedWord: String, val originalWord: String)
+//data class NLPSlotItem(val type: String, val normalizedWord: String, val originalWord: String)

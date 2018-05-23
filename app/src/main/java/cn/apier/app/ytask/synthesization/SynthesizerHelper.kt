@@ -58,7 +58,7 @@ object SynthesizerHelper {
     }
 
 
-    private val speechFinishHandler = object : Handler() {
+    private  val speechFinishHandler = object : Handler() {
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
             this@SynthesizerHelper.speechFinishCallback()

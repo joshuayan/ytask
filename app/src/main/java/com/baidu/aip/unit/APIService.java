@@ -7,7 +7,7 @@ import android.content.Context;
 
 import com.baidu.aip.unit.listener.OnResultListener;
 import com.baidu.aip.unit.model.AccessToken;
-import com.baidu.aip.unit.model.CommunicateResponse;
+import com.baidu.aip.unit.model.UnitResponseResult;
 import com.baidu.aip.unit.parser.CommunicateParser;
 import com.baidu.aip.unit.utils.HttpUtil;
 
@@ -66,7 +66,7 @@ public class APIService {
      * @param query    标记一次会话，当新建一个会话时，不需要传值。服务端会返回一个唯一id。如果要保持这次多轮会话，再次请求时传入该id
      * @param sessionId
      */
-    public void communicate(final OnResultListener<CommunicateResponse> listener,
+    public void communicate(final OnResultListener<UnitResponseResult> listener,
                             int sceneId, String query, String sessionId) {
 
         JSONObject jsonObject = new JSONObject();

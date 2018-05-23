@@ -3,25 +3,17 @@
  */
 package com.baidu.aip.unit.parser;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSON;
 import com.baidu.aip.unit.exception.UnitError;
-import com.baidu.aip.unit.model.CommunicateResponse;
+import com.baidu.aip.unit.model.UnitResponseResult;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-
-public class CommunicateParser implements Parser<CommunicateResponse> {
+public class CommunicateParser implements Parser<UnitResponseResult> {
 
     @Override
-    public CommunicateResponse parse(String json) throws UnitError {
+    public UnitResponseResult parse(String json) throws UnitError {
 
 
-        CommunicateResponse response=  JSON.parseObject(json,CommunicateResponse.class);
+        UnitResponseResult response=  JSON.parseObject(json,UnitResponseResult.class);
 
 //
 //        Log.e("xx", "CommunicateParser:" + json);
@@ -33,12 +25,12 @@ public class CommunicateParser implements Parser<CommunicateResponse> {
 //                throw error;
 //            }
 //
-//            CommunicateResponse result = new CommunicateResponse();
+//            UnitResponseResult result = new UnitResponseResult();
 //            result.setLogId(jsonObject.optLong("log_id"));
 //            result.setJsonRes(json);
 //
 //            JSONObject resultObject = jsonObject.getJSONObject("result");
-//            List<CommunicateResponse.Action> actionList = result.actionList;
+//            List<UnitResponseResult.Action> actionList = result.actionList;
 //            JSONArray actionListArray = resultObject.optJSONArray("action_list");
 //            if (actionListArray != null) {
 //                for (int i = 0; i < actionListArray.length(); i++) {
@@ -46,11 +38,11 @@ public class CommunicateParser implements Parser<CommunicateResponse> {
 //                    if (actionListObject == null) {
 //                        continue;
 //                    }
-//                    CommunicateResponse.Action action = new CommunicateResponse.Action();
+//                    UnitResponseResult.Action action = new UnitResponseResult.Action();
 //                    action.actionId = actionListObject.optString("action_id");
 //                    JSONObject actionTypeObject = actionListObject.optJSONObject("action_type");
 //
-//                    action.actionType = new CommunicateResponse.ActionType();
+//                    action.actionType = new UnitResponseResult.ActionType();
 //                    action.actionType.target = actionTypeObject.optString("act_target");
 //                    action.actionType.targetDetail = actionTypeObject.optString("act_target_detail");
 //                    action.actionType.type = actionTypeObject.optString("act_type");

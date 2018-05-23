@@ -1,15 +1,12 @@
 package cn.apier.app.ytask.recognization
 
 import android.util.Log
-
-import com.baidu.speech.EventListener
-import com.baidu.speech.asr.SpeechConstant
-
-import org.json.JSONException
-import org.json.JSONObject
-
 import cn.apier.app.ytask.util.Logger
 import cn.apier.app.ytask.wakeup.ErrorTranslation
+import com.baidu.speech.EventListener
+import com.baidu.speech.asr.SpeechConstant
+import org.json.JSONException
+import org.json.JSONObject
 
 /**
  * Created by fujiayi on 2017/6/14.

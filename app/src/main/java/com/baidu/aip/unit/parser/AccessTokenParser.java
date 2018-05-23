@@ -3,11 +3,11 @@
  */
 package com.baidu.aip.unit.parser;
 
-import com.baidu.aip.unit.exception.UnitError;
-import com.baidu.aip.unit.model.AccessToken;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.baidu.aip.unit.exception.UnitError;
+import com.baidu.aip.unit.model.AccessToken;
 
 public class AccessTokenParser implements Parser<AccessToken> {
     @Override

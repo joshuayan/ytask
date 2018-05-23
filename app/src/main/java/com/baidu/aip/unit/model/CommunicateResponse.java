@@ -5,10 +5,16 @@ package com.baidu.aip.unit.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
-public class CommunicateResponse extends ResponseResult {
+public class CommunicateResponse  extends ResponseResult {
+
+    public List<CommunicateResponse.Action> actionList = new ArrayList<>();
+
+    public Schema schema;
+
+    public String sessionId;
+
 
     public static class Action {
         public String actionId;
@@ -32,49 +38,9 @@ public class CommunicateResponse extends ResponseResult {
     // public static class CodeAction {}
 
     public static class Schema {
-        public List<SlotItem> botMergedSlots = new ArrayList();
+        public List botMergedSlots = new ArrayList();
         public String currentQueryInent;
         public int intentConfidence;
-
-        public List<SlotItem> getSlotsByType(String type) {
-
-            List<SlotItem> result = new ArrayList<>();
-
-            for (SlotItem item : this.botMergedSlots) {
-                if (Objects.equals(type, item.type)) {
-                    result.add(item);
-                }
-            }
-
-            return result;
-        }
-    }
-
-    public static class SlotItem {
-        public int begin;
-        public float confidence;
-        public int length;
-        public String mergeMethod;
-        public String normalizedWord;
-        public String originalWord;
-        public int sessionOffset;
-        public String type;
-        public String wordType;
-
-        @Override
-        public String toString() {
-            return "SlotItem{" +
-                    "begin=" + begin +
-                    ", confidence=" + confidence +
-                    ", length=" + length +
-                    ", mergeMethod='" + mergeMethod + '\'' +
-                    ", normalizedWord='" + normalizedWord + '\'' +
-                    ", originalWord='" + originalWord + '\'' +
-                    ", sessionOffset=" + sessionOffset +
-                    ", type='" + type + '\'' +
-                    ", wordType='" + wordType + '\'' +
-                    '}';
-        }
     }
 
 }

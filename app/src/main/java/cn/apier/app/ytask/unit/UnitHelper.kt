@@ -1,19 +1,17 @@
 package cn.apier.app.ytask.unit
 
-import android.text.TextUtils
 import android.util.Log
+import cn.apier.app.voice.nlp.NLPResult
 import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.TaskApi
-import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.scene.SceneActionDispatcher
-import com.baidu.aip.chatkit.model.Message
+import cn.apier.app.ytask.scene.SceneActions
 import com.baidu.aip.chatkit.model.User
-import com.baidu.aip.chatkit.utils.DateFormatter
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
-import com.baidu.aip.unit.model.CommunicateResponse
+import com.baidu.aip.unit.model.UnitResponseResult
 import java.util.*
 
 /**
@@ -21,6 +19,7 @@ import java.util.*
  */
 object UnitHelper {
 
+    var onResult: (result: NLPResult) -> Unit = { SceneActionDispatcher.dispatch(it) }
 
     private var sessionId: String = ""
     private var mid: Long = 1L
@@ -30,10 +29,19 @@ object UnitHelper {
 
     fun understand(txt: String) {
 
-        APIService.getInstance().communicate(object : OnResultListener<CommunicateResponse> {
-            override fun onResult(result: CommunicateResponse) {
+        APIService.getInstance().communicate(object : OnResultListener<UnitResponseResult> {
+            override fun onResult(result: UnitResponseResult) {
 
-                handleResponse(result)
+//                handleResponse(result)
+
+                if(result.result!=null) {
+
+                    val actionId = result.result.actionList[0].actionId
+                    val intent = actionId.substringBefore(SceneActions.POSTFIX_ACTION_RESPONSE)
+                    val nlpResult = NLPResult.ok(txt, intent, result)
+                    onResult(nlpResult)
+                }
+
             }
 
             override fun onError(error: UnitError) {
@@ -41,17 +49,5 @@ object UnitHelper {
             }
         }, Constants.SCENE_ID, txt, System.currentTimeMillis().toString())
     }
-
-
-    private fun handleResponse(response: CommunicateResponse?) {
-        response?.let {
-
-            Log.i(Constants.TAG_LOG, "unit response :$it")
-
-            SceneActionDispatcher.dispatch(response)
-
-        }
-    }
-
 
 }

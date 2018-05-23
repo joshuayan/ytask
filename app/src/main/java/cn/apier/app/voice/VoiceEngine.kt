@@ -1,11 +1,15 @@
 package cn.apier.app.voice
 
 import android.util.Log
+import cn.apier.app.voice.nlp.NLPResult
 
 /**
  * Created by yanjunhua on 2017/10/11.
  */
 class VoiceEngine {
+
+    private val defaultAfterAsr: (txt: String) -> Unit = {}
+
 
     private val TAG = VoiceEngine::class.java.simpleName
     private var phase: VoiceEnginePhase = VoiceEnginePhase.NEW
@@ -77,7 +81,7 @@ class VoiceEngine {
         val currentSkill = this.getCurrentSkill(cn.apier.app.voice.VoiceSkillType.NLP)
         currentSkill?.let {
             val wuSkill = it as NlpSkill
-            wuSkill.understand(txt)
+            wuSkill.understand(txt, {})
         }
 
 

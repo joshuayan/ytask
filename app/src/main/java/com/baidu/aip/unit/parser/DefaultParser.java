@@ -3,13 +3,13 @@
  */
 package com.baidu.aip.unit.parser;
 
-import android.util.Log;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.baidu.aip.unit.exception.UnitError;
 import com.baidu.aip.unit.model.ResponseResult;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.util.Log;
 
 public class DefaultParser implements Parser<ResponseResult> {
 

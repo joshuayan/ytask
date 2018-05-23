@@ -1,8 +1,7 @@
 package cn.apier.app.ytask
 
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local com.baidu.aip.unit test, which will execute on the development machine (host).

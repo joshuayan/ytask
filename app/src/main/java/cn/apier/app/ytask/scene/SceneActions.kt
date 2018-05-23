@@ -5,5 +5,7 @@ package cn.apier.app.ytask.scene
  */
 object SceneActions {
     val ACTION_ADD_TASK = "add_task_cmd"
+    val ACTION_LIST_TASK = "list_task"
+
     val POSTFIX_ACTION_RESPONSE = "_satisfy"
 }

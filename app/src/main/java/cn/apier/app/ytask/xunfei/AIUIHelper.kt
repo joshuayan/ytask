@@ -2,7 +2,6 @@ package cn.apier.app.ytask.xunfei
 
 import android.util.Log
 import cn.apier.app.ytask.application.YTaskApplication
-import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import com.alibaba.fastjson.JSON
 import com.iflytek.aiui.AIUIAgent
 import com.iflytek.aiui.AIUIConstant

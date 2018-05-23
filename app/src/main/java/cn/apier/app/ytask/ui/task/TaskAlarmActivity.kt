@@ -1,7 +1,7 @@
 package cn.apier.app.ytask.ui.task
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import cn.apier.app.ytask.R
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_task_alarm.*

@@ -21,7 +21,6 @@ import android.widget.TextView
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.TaskApi
-import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.dto.TaskDto
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
@@ -33,7 +32,7 @@ import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
 import com.baidu.aip.unit.listener.VoiceRecognizeCallback
-import com.baidu.aip.unit.model.CommunicateResponse
+import com.baidu.aip.unit.model.UnitResponseResult
 import com.baidu.aip.unit.voice.VoiceRecognizer
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -44,7 +43,6 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         MessageInput.VoiceInputListener {
 
 //    private lateinit var speaker: Speaker
-
 
 
     private lateinit var voiceRecognizer: VoiceRecognizer
@@ -70,10 +68,11 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        val view = inflater!!.inflate(R.layout.fragment_new, container, false)
+        val view = inflater.inflate(R.layout.fragment_new, container, false)
 
         val rvTask: RecyclerView = view.findViewById(R.id.rv_task)
         rvTask.layoutManager = LinearLayoutManager(view.context)
@@ -146,8 +145,8 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     private fun sendMessage(message: Message) {
 
-        APIService.getInstance().communicate(object : OnResultListener<CommunicateResponse> {
-            override fun onResult(result: CommunicateResponse) {
+        APIService.getInstance().communicate(object : OnResultListener<UnitResponseResult> {
+            override fun onResult(result: UnitResponseResult) {
 
                 handleResponse(result)
             }
@@ -159,12 +158,12 @@ class NewFragment : Fragment(), MessageInput.InputListener,
 
     }
 
-    private fun handleResponse(response: CommunicateResponse?) {
-        if (response != null) {
-            sessionId = response.result.sessionId
+    private fun handleResponse(responseResult: UnitResponseResult?) {
+        if (responseResult != null) {
+            sessionId = responseResult.result.sessionId
 
             //  如果有对于的动作action，请执行相应的逻辑
-            val actionList = response.result.actionList
+            val actionList = responseResult.result.actionList
             for (action in actionList) {
 
                 if (!TextUtils.isEmpty(action.say)) {
@@ -183,11 +182,11 @@ class NewFragment : Fragment(), MessageInput.InputListener,
                 when (action.actionId) {
                     "add_task_cmd_satisfy" -> {
 
-                        handleBusiness(response)
+                        handleBusiness(responseResult)
                     }
 
                     "add_task_satisfy" -> {
-                        handleBusiness(response)
+                        handleBusiness(responseResult)
                     }
                     else -> Log.e(Constants.TAG_LOG, "Unknown ActionId ${action.actionId}")
                 }
@@ -210,9 +209,9 @@ class NewFragment : Fragment(), MessageInput.InputListener,
         }
     }
 
-    private fun handleBusiness(response: CommunicateResponse) {
-        if (response.result.schema != null) {
-            val schema = response.result.schema!!
+    private fun handleBusiness(responseResult: UnitResponseResult) {
+        if (responseResult.result.schema != null) {
+            val schema = responseResult.result.schema!!
             val cmd = schema.getSlotsByType(Constants.SLOT_CMD)
             val items = schema.getSlotsByType(Constants.SLOT_TIME)
             val todos = schema.getSlotsByType(Constants.SLOT_TODO)
@@ -301,8 +300,8 @@ class NewFragment : Fragment(), MessageInput.InputListener,
     }
 
     override fun onVoiceInputClick() {
-        if (ActivityCompat.checkSelfPermission(this.activity, Manifest.permission.RECORD_AUDIO) != PackageManager
-                .PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this.context!!, Manifest.permission.RECORD_AUDIO) != PackageManager
+                        .PERMISSION_GRANTED) {
             this.requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO), 100)
             return
         }
@@ -376,16 +375,16 @@ class TaskViewHolder(itemView: View, private val taskViewAdapter: TaskViewAdapte
         rbSelect.setOnClickListener {
             taskViewAdapter.taskApi.finish(this.taskId).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe {
-                if (it.success) {
-                    SynthesizerHelper.speak("完成任务")
-                    this.taskViewAdapter.updateData()
-                }
-            }
+                        if (it.success) {
+                            SynthesizerHelper.speak("完成任务")
+                            this.taskViewAdapter.updateData()
+                        }
+                    }
         }
     }
 
     fun updateTask(uid: String, task: String, deadLine: String?) {
-        this.rbSelect.isChecked  = false
+        this.rbSelect.isChecked = false
         this.tvTask.text = task
         this.taskId = uid
         this.tvDeadline.visibility = View.GONE

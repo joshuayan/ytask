@@ -2,7 +2,6 @@ package cn.apier.app.ytask.domain.service
 
 import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.TaskApi
-import cn.apier.app.ytask.application.YTaskApplication
 
 /**
  * Created by yanjunhua on 2017/9/16.

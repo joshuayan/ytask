@@ -2,7 +2,6 @@ package cn.apier.app.ytask.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -14,7 +13,6 @@ import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.ui.base.BaseActivity
-import cn.apier.app.ytask.wakeup.WakeUpHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.find
@@ -42,13 +40,13 @@ class SignInActivity : BaseActivity() {
 
             val mobile = txtMobile.text.toString()
             val password = txtPassword.text.toString()
-            if (mobile.isNullOrBlank() || mobile.isNullOrEmpty()) {
+            if (mobile.isBlank() || mobile.isEmpty()) {
                 txtMobile.error = this.getString(R.string.err_mobile_required)
                 txtMobile.requestFocus()
                 return@setOnClickListener
             }
 
-            if (password.isNullOrEmpty() || password.isNullOrBlank()) {
+            if (password.isEmpty() || password.isBlank()) {
                 txtPassword.error = this.getString(R.string.err_password_required)
                 txtPassword.requestFocus()
                 return@setOnClickListener

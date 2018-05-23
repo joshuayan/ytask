@@ -33,8 +33,8 @@ public class ResponseResult {
 
 
     public class Result {
-        public CommunicateResponse.Schema schema;
-        public List<CommunicateResponse.Action> actionList = new ArrayList<>();
+        public UnitResponseResult.Schema schema;
+        public List<UnitResponseResult.Action> actionList = new ArrayList<>();
 
         public String sessionId;
 

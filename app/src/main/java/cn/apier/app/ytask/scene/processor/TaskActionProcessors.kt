@@ -13,8 +13,8 @@ import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.scene.SceneActions
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
-import cn.apier.app.ytask.ui.task.TaskListActivity
 import cn.apier.app.ytask.ui.task.TaskAlarmActivity
+import cn.apier.app.ytask.ui.task.TaskListActivity
 import com.baidu.aip.chatkit.utils.DateFormatter
 import com.baidu.aip.unit.model.ResponseResult
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -51,9 +51,7 @@ class AddTaskProcessor : SceneActionProcessor {
 //
 //                val listIntent = Intent(TaskActivityFilters.ACTION_TASK_LIST)
 //                listIntent.addCategory(TaskActivityFilters.CATEGORY_TASK)
-                val listIntent = Intent(YTaskApplication.currentApplication.currentActivity, TaskListActivity::class.java)
-
-                YTaskApplication.currentApplication.startActivity(listIntent)
+                showTaskList()
 
             } else {
                 Log.i(this.javaClass.simpleName, "Can not process action [${action.actionId}]")
@@ -153,4 +151,17 @@ class AddTaskProcessor : SceneActionProcessor {
     }
 
 
+}
+
+class ListTaskProcessor : SceneActionProcessor {
+    override fun process(result: ResponseResult.Result) {
+        showTaskList()
+    }
+
+    override fun canProcess(action: String): Boolean = action == SceneActions.ACTION_LIST_TASK + SceneActions.POSTFIX_ACTION_RESPONSE
+}
+
+private fun showTaskList() {
+    val listIntent = Intent(YTaskApplication.currentApplication, TaskListActivity::class.java)
+    YTaskApplication.currentApplication.startActivity(listIntent)
 }

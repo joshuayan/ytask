@@ -18,8 +18,9 @@ abstract class BaseActivity : AppCompatActivity() {
         YTaskApplication.currentApplication.currentActivity = this
     }
 
-   open fun refresh() {}
+    open fun refresh() {}
 
 
+    open fun daemonActivity() = false
 
 }

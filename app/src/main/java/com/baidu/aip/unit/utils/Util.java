@@ -3,11 +3,10 @@
  */
 package com.baidu.aip.unit.utils;
 
-import android.util.Log;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
+import android.util.Log;
 import okio.Buffer;
 
 // copied from OKHttp
