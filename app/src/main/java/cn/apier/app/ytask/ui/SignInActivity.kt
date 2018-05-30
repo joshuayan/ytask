@@ -12,9 +12,12 @@ import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
+import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import cn.apier.app.ytask.ui.base.BaseActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.debug
 import org.jetbrains.anko.find
 import org.jetbrains.anko.toast
 
@@ -22,6 +25,10 @@ import org.jetbrains.anko.toast
  * Created by yanjunhua on 2017/9/5.
  */
 class SignInActivity : BaseActivity() {
+
+    companion object {
+        val LOGGER = AnkoLogger(SignInActivity::class.java)
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,18 +68,18 @@ class SignInActivity : BaseActivity() {
             val application = this.application as YTaskApplication
             ApiFactory.apiProxy(UserApi::class.java).signIn(mobile, password).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe { result ->
-                Log.d("ytask", result.toString())
-                if (result.success) {
-                    application.signedIn(mobile)
-                    toast("signed in")
-                    gotoMain()
-                } else {
-                    toast("Fail to sign in.")
-                    progressBar.visibility = View.GONE
-                    lltForm.visibility = View.VISIBLE
-                    it.isEnabled = true
-                }
-            }
+                        Log.d("ytask", result.toString())
+                        if (result.success) {
+                            application.signedIn(mobile)
+                            toast("signed in")
+                            gotoMain()
+                        } else {
+                            toast("Fail to sign in.")
+                            progressBar.visibility = View.GONE
+                            lltForm.visibility = View.VISIBLE
+                            it.isEnabled = true
+                        }
+                    }
         }
 
     }

@@ -6,6 +6,8 @@ import android.util.Log
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
+import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.debug
 
 import org.json.JSONObject
 
@@ -15,7 +17,7 @@ import org.json.JSONObject
 
 class MyWakeup(context: Context, private val eventListener: EventListener) {
 
-    private var wp: EventManager? = null
+    private val wp: EventManager
 
 
     init {
@@ -25,7 +27,7 @@ class MyWakeup(context: Context, private val eventListener: EventListener) {
         }
         isInited = true
         wp = EventManagerFactory.create(context, "wp")
-        wp!!.registerListener(eventListener)
+        wp.registerListener(eventListener)
     }
 
     constructor(context: Context, eventListener: IWakeupListener) : this(context, WakeupEventAdapter(eventListener)) {}
@@ -33,20 +35,21 @@ class MyWakeup(context: Context, private val eventListener: EventListener) {
     fun start(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
         Log.i(TAG + ".Debug", "wakeup params(反馈请带上此行日志):" + json)
-        val data= byteArrayOf()
-        wp!!.send(WAKEUP_START, json, data, 0, 0)
+        Log.i(TAG + ".Debug", "sending command Wakeup.")
+        wp.send(WAKEUP_START, json, null, 0, 0)
+        Log.i(TAG + ".Debug", "Wakeup Sent")
+
     }
 
 
     fun stop() {
         Log.i(TAG, "唤醒结束")
-        wp!!.send(WAKEUP_STOP, null, null, 0, 0)
+        wp.send(WAKEUP_STOP, null, null, 0, 0)
     }
 
     fun release() {
         stop()
-        wp!!.unregisterListener(eventListener)
-        wp = null
+        wp.unregisterListener(eventListener)
         isInited = false
     }
 
@@ -58,6 +61,5 @@ class MyWakeup(context: Context, private val eventListener: EventListener) {
         private val TAG = "MyWakeup"
         private const val WAKEUP_START = "wp.start"
         private const val WAKEUP_STOP = "wp.stop"
-
     }
 }

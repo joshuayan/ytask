@@ -7,7 +7,7 @@ import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.scene.SceneActionDispatcher
 import cn.apier.app.ytask.scene.SceneActions
-import com.baidu.aip.chatkit.model.User
+//import com.baidu.aip.chatkit.model.User
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
@@ -21,11 +21,11 @@ object UnitHelper {
 
     var onResult: (result: NLPResult) -> Unit = { SceneActionDispatcher.dispatch(it) }
 
-    private var sessionId: String = ""
-    private var mid: Long = 1L
-    private val sender: User = User("1", "joshua", "Joshua Yan", true)
-    private val taskApi: TaskApi = ApiFactory.apiProxy(TaskApi::class.java)
-
+//    private var sessionId: String = ""
+//    private var mid: Long = 1L
+//    private val sender: User = User("1", "joshua", "Joshua Yan", true)
+//    private val taskApi: TaskApi = ApiFactory.apiProxy(TaskApi::class.java)
+//
 
     fun understand(txt: String) {
 

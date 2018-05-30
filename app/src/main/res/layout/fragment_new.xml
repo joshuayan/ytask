@@ -24,13 +24,13 @@
         <!--android:inputType="textPersonName"-->
         <!--android:singleLine="true" />-->
 
-    <com.baidu.aip.chatkit.message.MessageInput
-        android:id="@+id/input"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/input_bg_color"
-        app:inputBackground="@drawable/chat_text_input_bg"
-        app:voiceInputBackground="@drawable/chat_speaker"
-        app:inputHint="@string/hint_new_input"/>
+    <!--<com.baidu.aip.chatkit.message.MessageInput-->
+        <!--android:id="@+id/input"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:background="@color/input_bg_color"-->
+        <!--app:inputBackground="@drawable/chat_text_input_bg"-->
+        <!--app:voiceInputBackground="@drawable/chat_speaker"-->
+        <!--app:inputHint="@string/hint_new_input"/>-->
 </RelativeLayout>

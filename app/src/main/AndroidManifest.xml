@@ -70,6 +70,7 @@
             android:name="com.baidu.speech.SECRET_KEY"
             android:value="dqNhbo876W7mGGPVTRVOa5LMe2YbYVEp" />
 
+
         <service
             android:name="com.baidu.speech.VoiceRecognitionService"
             android:exported="false" />

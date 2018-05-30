@@ -18,11 +18,11 @@ import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.dto.TaskDto
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import cn.apier.app.ytask.ui.base.BaseActivity
-import com.baidu.aip.chatkit.utils.DateFormatter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_list_task.*
 import org.jetbrains.anko.textColor
+import java.text.SimpleDateFormat
 import java.util.*
 
 class TaskListActivity : BaseActivity() {
@@ -69,11 +69,11 @@ class TaskListActivity : BaseActivity() {
             1 -> {
                 taskApi.finish(it.obj as String).subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    if (it.success) {
-                        SynthesizerHelper.speak("完成任务")
-                        this.taskViewAdapter.updateData()
-                    }
-                }
+                            if (it.success) {
+                                SynthesizerHelper.speak("完成任务")
+                                this.taskViewAdapter.updateData()
+                            }
+                        }
             }
             else -> {
                 Log.w(TAG, "Unknown Message")
@@ -151,7 +151,7 @@ class TaskListActivity : BaseActivity() {
             this.tvDeadline.visibility = View.GONE
             this.tvTask.textColor = oldColor
             deadLine?.let {
-                this.tvDeadline.text = DateFormatter.format(it, "yyyy-MM-dd HH:mm:ss");this.tvDeadline.visibility = View.VISIBLE
+                this.tvDeadline.text = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(it);this.tvDeadline.visibility = View.VISIBLE
                 if (System.currentTimeMillis() > deadLine.time) {
                     this.tvTask.textColor = Color.RED
                 }

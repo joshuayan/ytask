@@ -71,7 +71,8 @@ class YTaskApplication : Application() {
 
     }
 
-    private fun sign(timestampInMs: String): String = Utils.md5(Constants.appKey(this.debug) + Constants.secretKey(this.debug) + timestampInMs) ?: ""
+    private fun sign(timestampInMs: String): String = Utils.md5(Constants.appKey(this.debug) + Constants.secretKey(this.debug) + timestampInMs)
+            ?: ""
 
 
     private fun initToken(successFun: () -> Unit = {}) {
@@ -147,5 +148,9 @@ class YTaskApplication : Application() {
 
     fun startWakeUp() {
         WakeUpHelper.startWakeUp({ BDRecognizerHelper.start() })
+    }
+
+    fun startRecognize() {
+        BDRecognizerHelper.start()
     }
 }

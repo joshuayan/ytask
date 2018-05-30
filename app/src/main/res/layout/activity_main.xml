@@ -19,6 +19,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/btnRec"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="录音"/>
+
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/nv_main"
         android:layout_width="0dp"

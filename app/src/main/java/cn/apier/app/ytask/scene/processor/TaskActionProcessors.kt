@@ -15,7 +15,6 @@ import cn.apier.app.ytask.scene.SceneActions
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import cn.apier.app.ytask.ui.task.TaskAlarmActivity
 import cn.apier.app.ytask.ui.task.TaskListActivity
-import com.baidu.aip.chatkit.utils.DateFormatter
 import com.baidu.aip.unit.model.ResponseResult
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -88,7 +87,7 @@ class AddTaskProcessor : SceneActionProcessor {
                         }
                         matches("""\d{2}:\d{2}:\d{2}""".toRegex()) -> {
                             val now = Date(System.currentTimeMillis())
-                            val dateStr = DateFormatter.format(now, "yyyy-MM-dd")
+                            val dateStr = SimpleDateFormat("yyyy-MM-dd").format(now)
                             deadLine = "$dateStr $timeStr"
                         }
                         isEmpty() -> {
