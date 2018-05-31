@@ -2,12 +2,10 @@ package cn.apier.app.ytask.xunfei
 
 import android.util.Log
 import cn.apier.app.ytask.application.YTaskApplication
-import com.alibaba.fastjson.JSON
 import com.iflytek.aiui.AIUIAgent
 import com.iflytek.aiui.AIUIConstant
 import com.iflytek.aiui.AIUIListener
 import com.iflytek.aiui.AIUIMessage
-import org.json.JSONObject
 import java.io.IOException
 
 
@@ -18,7 +16,7 @@ object AIUIHelper {
 
     private val TAG = AIUIHelper::class.java.simpleName
     private val mAIUIAgent: AIUIAgent
-    private var mAIUIState = AIUIConstant.STATE_IDLE
+    var mAIUIState = AIUIConstant.STATE_IDLE
     private var onFinish: (answer: String) -> Unit = {}
     private var onError: (code: String, info: String) -> Unit = { code, info -> Log.e(TAG, "On Error [code:$code,info:$info]") }
 
@@ -30,38 +28,7 @@ object AIUIHelper {
             }
 
             AIUIConstant.EVENT_RESULT -> {
-                Log.i(TAG, "on event: " + event.eventType)
-                Log.i(TAG, "event info : ${event.info}")
-
-                val eventInfo = JSON.parseObject(event.info, EventInfo::class.java)
-
-
-//                    val bizParamJson = JSONObject(event.info)
-//                    val data = bizParamJson.getJSONArray("data").getJSONObject(0)
-//                    val params = data.getJSONObject("params")
-//                    val content = data.getJSONArray("content").getJSONObject(0)
-
-                val params = eventInfo.data?.get(0)?.params
-                val content = eventInfo.data?.get(0)?.content?.get(0)
-//                    if (content.has("cnt_id")) {
-                content?.cnt_id?.let {
-
-
-                    val cntJson = JSONObject(String(event.data.getByteArray(it)!!, Charsets.UTF_8))
-
-                    if (params?.isNLP() == true) {
-                        // 解析得到语义结果
-                        val resultStr = cntJson.optString("intent")
-                        Log.i(TAG, "aiui result: $resultStr")
-
-                        val answer = JSONObject(resultStr).getJSONObject("answer").getString("text")
-                        Log.i(TAG, "answer: $answer")
-
-                        this.onFinish(answer)
-//                            SynthesizerHelper.speak(answer)
-                    }
-                }
-
+                EventProcessor.processResultEvent(event)
             }
 
             AIUIConstant.EVENT_ERROR -> {
@@ -118,12 +85,15 @@ object AIUIHelper {
         mAIUIAgent = AIUIAgent.createAgent(YTaskApplication.currentApplication, getAIUIParams(), mAIUIListener)
         val startMsg = AIUIMessage(AIUIConstant.CMD_START, 0, 0, null, null)
         mAIUIAgent.sendMessage(startMsg)
-        val wakeupMsg = AIUIMessage(AIUIConstant.CMD_WAKEUP, 0, 0, "", null)
-        mAIUIAgent.sendMessage(wakeupMsg)
+        confirmWorking()
+
+
+        //register event processor
+        EventProcessor.registerNlpProcessor(AddTaskSemanticProcessor())
+        EventProcessor.registerNlpProcessor(ShowTaskSemanticProcessor())
     }
 
-
-    private fun showTip(str: String) {
+    fun showTip(str: String) {
     }
 
     private fun getAIUIParams(): String {
@@ -146,9 +116,86 @@ object AIUIHelper {
     }
 
     fun understand(txt: String, onFinish: (answer: String) -> Unit = {}, onError: (code: String, info: String) -> Unit = { code, info -> }) {
+        confirmWorking()
         val params = "data_type=text"
         val textData = txt.toByteArray()
         val msg = AIUIMessage(AIUIConstant.CMD_WRITE, 0, 0, params, textData)
         mAIUIAgent.sendMessage(msg)
+    }
+
+    private fun confirmWorking() {
+        if (AIUIConstant.STATE_WORKING != mAIUIState) {
+            val wakeupMsg = AIUIMessage(AIUIConstant.CMD_WAKEUP, 0, 0, "", null)
+            mAIUIAgent.sendMessage(wakeupMsg)
+        }
+    }
+
+    fun startRecord() {
+        confirmWorking()
+        val params = "sample_rate=16000,data_type=audio,pers_param={\"uid\":\"\"},tag=audio-tag"
+        val startRecord = AIUIMessage(AIUIConstant.CMD_START_RECORD, 0, 0, params, null)
+
+        mAIUIAgent.sendMessage(startRecord)
+    }
+
+    fun stopRecord() {
+
+        Log.i(TAG, "stop voice nlp")
+        // 停止录音
+        val params = "sample_rate=16000,data_type=audio"
+        val stopRecord = AIUIMessage(AIUIConstant.CMD_STOP_RECORD, 0, 0, params, null)
+
+        mAIUIAgent.sendMessage(stopRecord)
+    }
+
+
+//    private fun startRecordAudio() {
+//        sendMessage(AIUIMessage(AIUIConstant.CMD_START_RECORD, 0, 0, "data_type=audio,sample_rate=16000", null))
+//    }
+//
+//    private fun stopRecordAudio() {
+//        sendMessage(AIUIMessage(AIUIConstant.CMD_STOP_RECORD, 0, 0, "data_type=audio,sample_rate=16000", null))
+//    }
+
+//
+//    private fun beginAudio() {
+//        mAudioStart = System.currentTimeMillis()
+//        if (mAppendVoiceMsg != null) {
+//            //更新上一条未完成的语音消息内容
+//            updateMessage(mAppendVoiceMsg)
+//            mAppendVoiceMsg = null
+//            mInterResultStack.clear()
+//        }
+//        mAppendVoiceMsg = Message(USER, Voice, byteArrayOf())
+//        mAppendVoiceMsg.cacheContent = ""
+//        //语音消息msgData为录音时长
+//        mAppendVoiceMsg.msgData = ByteBuffer.allocate(4).putFloat(0f).array()
+//        addMessageToDB(mAppendVoiceMsg)
+//    }
+//
+//    private fun endAudio() {
+//        if (mAppendVoiceMsg != null) {
+//            mAppendVoiceMsg.msgData = ByteBuffer.allocate(4).putFloat((System.currentTimeMillis() - mAudioStart) / 1000.0f).array()
+//            updateMessage(mAppendVoiceMsg)
+//        }
+//    }
+
+
+//    private fun sendMessage(message: AIUIMessage) {
+//        if (mAIUIAgent != null) {
+//            //确保AIUI处于唤醒状态
+////            if (mCurrentState != AIUIConstant.STATE_WORKING && !mCurrentSettings.wakeup) {
+////                mAIUIAgent.sendMessage(AIUIMessage(AIUIConstant.CMD_WAKEUP, 0, 0, "", null))
+////            }
+//
+//            mAIUIAgent.sendMessage(message)
+//        }
+//    }
+
+    fun destroy() {
+        if (this.mAIUIState == AIUIConstant.STATE_WORKING) {
+            this.stopRecord()
+        }
+        this.mAIUIAgent.destroy()
     }
 }

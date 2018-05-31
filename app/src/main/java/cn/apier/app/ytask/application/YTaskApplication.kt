@@ -16,6 +16,7 @@ import cn.apier.app.ytask.scene.processor.AddTaskProcessor
 import cn.apier.app.ytask.scene.processor.ListTaskProcessor
 import cn.apier.app.ytask.ui.base.BaseActivity
 import cn.apier.app.ytask.wakeup.WakeUpHelper
+import cn.apier.app.ytask.xunfei.AIUIHelper
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
@@ -62,7 +63,6 @@ class YTaskApplication : Application() {
         initToken { initBDToken() }
 
         initAIUI()
-        //init synthesizer
     }
 
 
@@ -104,10 +104,17 @@ class YTaskApplication : Application() {
             if (!it.daemonActivity()) {
                 it.finish()
             }
-            it.startActivity(intent)
+            super.startActivity(intent)
 
         }
     }
+
+
+    fun <T : BaseActivity> startActivity(clazz: Class<T>) {
+        val intent = Intent(this, clazz)
+        this.startActivity(intent)
+    }
+
 
     fun signedIn(userId: String) {
         this.signedIn = true
@@ -118,8 +125,11 @@ class YTaskApplication : Application() {
 
 
     override fun onTerminate() {
-        WakeUpHelper.release()
         super.onTerminate()
+
+        WakeUpHelper.release()
+
+        AIUIHelper.destroy()
     }
 
     private fun processMsg(msg: Message) {
@@ -127,9 +137,14 @@ class YTaskApplication : Application() {
         msg.obj?.let { toast("message:$it") }
     }
 
+    fun showMessage(msg: String) {
+        toast(msg)
+    }
+
     private fun initBDToken() {
 
         APIService.getInstance().init(applicationContext)
+
         ApiFactory.apiProxy(UserApi::class.java).queryBDApplicationInfo().subscribeOn(Schedulers.io()).subscribe {
 
             APIService.getInstance().initAccessToken(object : OnResultListener<AccessToken> {
@@ -147,10 +162,22 @@ class YTaskApplication : Application() {
     }
 
     fun startWakeUp() {
-        WakeUpHelper.startWakeUp({ BDRecognizerHelper.start() })
+        WakeUpHelper.startWakeUp({
+            BDRecognizerHelper.start()
+//            WakeUpHelper.stop()
+//            AIUIHelper.startRecord()
+        })
     }
 
     fun startRecognize() {
+//        AIUIHelper.startRecord()
+
         BDRecognizerHelper.start()
     }
+
+
+    fun refresh() {
+        this.currentActivity?.refresh()
+    }
+
 }

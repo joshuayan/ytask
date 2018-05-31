@@ -1,5 +1,6 @@
 package cn.apier.app.ytask.ui.base
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import cn.apier.app.ytask.application.YTaskApplication
@@ -23,4 +24,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
     open fun daemonActivity() = false
 
+
+    override fun startActivity(intent: Intent) {
+        YTaskApplication.currentApplication.startActivity(intent)
+    }
 }

@@ -30,7 +30,7 @@ object ApiFactory {
             result = caches[clazz.simpleName] as T
         } else {
             result = this.retrofit.create(clazz)
-            caches.put(clazz.simpleName, result)
+            caches[clazz.simpleName] = result
         }
 
         return result

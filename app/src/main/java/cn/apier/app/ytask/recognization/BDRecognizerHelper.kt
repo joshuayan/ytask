@@ -7,12 +7,14 @@ import android.util.Log
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.recognization.all.AllRecogParams
+import cn.apier.app.ytask.xunfei.AIUIHelper
 
 /**
  * Created by yanjunhua on 2017/9/23.
  */
 object BDRecognizerHelper {
 
+    private val TAG = BDRecognizerHelper::class.java.simpleName
 
     private val handler = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -35,13 +37,18 @@ object BDRecognizerHelper {
         val pidParams = mutableMapOf<String, Any>()
 
         pidParams.putAll(params)
-        pidParams.put("pid", 15361)
+        pidParams.put("pid", 1536)
         this.myRecognizer.start(pidParams)
     }
 
     private fun processMsg(msg: Message) {
         when (msg.what) {
-            0 -> this.result = msg.obj as String
+            0 -> {
+                this.result = msg.obj as String
+                YTaskApplication.currentApplication.showMessage("recognize result:${this.result}")
+                Log.i(TAG, "result:${this.result}")
+                AIUIHelper.understand(this.result)
+            }
         }
     }
 

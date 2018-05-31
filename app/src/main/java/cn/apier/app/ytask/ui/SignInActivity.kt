@@ -14,6 +14,7 @@ import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import cn.apier.app.ytask.ui.base.BaseActivity
+import cn.apier.app.ytask.xunfei.EventInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.AnkoLogger

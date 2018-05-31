@@ -27,7 +27,7 @@ class MyRecognizer
     /**
      * SDK 内部核心 EventManager 类
      */
-    private var asr: EventManager? = null
+    private val asr: EventManager
 
     /**
      * 初始化
@@ -43,7 +43,7 @@ class MyRecognizer
         }
         isInited = true
         asr = EventManagerFactory.create(context, "asr")
-        asr!!.registerListener(eventListener)
+        asr.registerListener(eventListener)
     }
 
 
@@ -54,7 +54,7 @@ class MyRecognizer
     fun loadOfflineEngine(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
         Logger.info(TAG + ".Debug", "loadOfflineEngine params:" + json)
-        asr!!.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
+        asr.send(SpeechConstant.ASR_KWS_LOAD_ENGINE, json, null, 0, 0)
         isOfflineEngineLoaded = true
         // 没有ASR_KWS_LOAD_ENGINE这个回调表试失败，如缺少第一次联网时下载的正式授权文件。
     }
@@ -62,7 +62,7 @@ class MyRecognizer
     fun start(params: Map<String, Any>) {
         val json = JSONObject(params).toString()
         Logger.info(TAG + ".Debug", "asr params(反馈请带上此行日志):" + json)
-        asr!!.send(SpeechConstant.ASR_START, json, null, 0, 0)
+        asr.send(SpeechConstant.ASR_START, json, null, 0, 0)
     }
 
     /**
@@ -70,7 +70,7 @@ class MyRecognizer
      */
     fun stop() {
         Logger.info(TAG, "停止录音")
-        asr!!.send(SpeechConstant.ASR_STOP, "{}", null, 0, 0)
+        asr.send(SpeechConstant.ASR_STOP, "{}", null, 0, 0)
     }
 
     /**
@@ -79,18 +79,17 @@ class MyRecognizer
      */
     fun cancel() {
         Logger.info(TAG, "取消识别")
-        asr!!.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0)
+        asr.send(SpeechConstant.ASR_CANCEL, "{}", null, 0, 0)
     }
 
 
     fun release() {
         cancel()
         if (isOfflineEngineLoaded) {
-            asr!!.send(SpeechConstant.ASR_KWS_UNLOAD_ENGINE, null, null, 0, 0)
+            asr.send(SpeechConstant.ASR_KWS_UNLOAD_ENGINE, null, null, 0, 0)
             isOfflineEngineLoaded = false
         }
-        asr!!.unregisterListener(eventListener)
-        asr = null
+        asr.unregisterListener(eventListener)
         isInited = false
     }
 

@@ -48,7 +48,7 @@ class AddTaskProcessor : SceneActionProcessor {
 
                 handleBusiness(result)
 //
-//                val listIntent = Intent(TaskActivityFilters.ACTION_TASK_LIST)
+//                val listIntent = NlpIntent(TaskActivityFilters.ACTION_TASK_LIST)
 //                listIntent.addCategory(TaskActivityFilters.CATEGORY_TASK)
                 showTaskList()
 
