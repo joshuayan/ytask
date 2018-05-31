@@ -12,13 +12,10 @@ import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.ApiFactory
 import cn.apier.app.ytask.api.UserApi
 import cn.apier.app.ytask.application.YTaskApplication
-import cn.apier.app.ytask.synthesization.SynthesizerHelper
 import cn.apier.app.ytask.ui.base.BaseActivity
-import cn.apier.app.ytask.xunfei.EventInfo
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
 import org.jetbrains.anko.find
 import org.jetbrains.anko.toast
 

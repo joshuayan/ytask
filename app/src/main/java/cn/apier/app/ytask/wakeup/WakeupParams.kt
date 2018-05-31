@@ -2,7 +2,6 @@ package cn.apier.app.ytask.wakeup
 
 
 import cn.apier.app.ytask.common.SpeechConstant
-import cn.apier.app.ytask.recognization.PidBuilder
 import java.util.*
 
 

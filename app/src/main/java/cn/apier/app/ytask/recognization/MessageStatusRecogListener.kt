@@ -2,8 +2,6 @@ package cn.apier.app.ytask.recognization
 
 import android.os.Handler
 import android.os.Message
-import cn.apier.app.ytask.unit.UnitHelper
-import cn.apier.app.ytask.xunfei.AIUIHelper
 
 /**
  * Created by fujiayi on 2017/6/16.

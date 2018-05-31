@@ -2,13 +2,9 @@ package cn.apier.app.ytask.wakeup
 
 import android.content.Context
 import android.util.Log
-
 import com.baidu.speech.EventListener
 import com.baidu.speech.EventManager
 import com.baidu.speech.EventManagerFactory
-import org.jetbrains.anko.AnkoLogger
-import org.jetbrains.anko.debug
-
 import org.json.JSONObject
 
 /**

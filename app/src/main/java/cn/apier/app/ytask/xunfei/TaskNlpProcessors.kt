@@ -1,9 +1,5 @@
 package cn.apier.app.ytask.xunfei
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.util.Log
 import cn.apier.app.ytask.R
 import cn.apier.app.ytask.api.ApiFactory
@@ -11,19 +7,16 @@ import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.application.YTaskApplication
 import cn.apier.app.ytask.common.AlarmHelper
 import cn.apier.app.ytask.common.Constants
+import cn.apier.app.ytask.common.Utils
 import cn.apier.app.ytask.synthesization.SynthesizerHelper
-import cn.apier.app.ytask.ui.task.TaskAlarmActivity
 import cn.apier.app.ytask.ui.task.TaskListActivity
 import com.alibaba.fastjson.JSON
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.text.SimpleDateFormat
 
 
 class AddTaskSemanticProcessor : NlpSemanticProcessor {
 
-    private var content: String = ""
-    private var timer: String? = null
 
     companion object {
         private val SLOT_TASK_CONTENT = "taskContent"
@@ -34,16 +27,17 @@ class AddTaskSemanticProcessor : NlpSemanticProcessor {
     override fun intent(): String = "add_task"
 
     override fun process(semantic: Semantic) {
-
+        var content: String = ""
+        var timer: String? = null
         semantic.slots.forEach {
             when (it.name) {
                 SLOT_TASK_CONTENT -> {
-                    this.content = it.normValue
+                    content = it.normValue
                 }
                 SLOT_TASK_TIMER -> {
                     // normValue={"datetime":"2018-05-31T10:00:00","suggestDatetime":"2018-05-31T10:00:00"}
 
-                    this.timer = JSON.parseObject(it.normValue).getString("suggestDatetime")
+                    timer = JSON.parseObject(it.normValue).getString("suggestDatetime").replace("T", " ")
                 }
             }
         }
@@ -52,15 +46,22 @@ class AddTaskSemanticProcessor : NlpSemanticProcessor {
         Log.i(TAG, "task content:$content; timer:$timer")
 
 
+        var normalTimer = timer
+        timer?.let {
+            normalTimer = Utils.normalizeDateTimeStr(it)
+        }
 
-        ApiFactory.apiProxy(TaskApi::class.java).newTask(content, timer).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        ApiFactory.apiProxy(TaskApi::class.java).newTask(content, normalTimer).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe({
             if (it.success) {
                 val txt = YTaskApplication.currentApplication.resources.getString(R.string.txt_task_add_success)
-                AlarmHelper.alarm(timer, content)
+                AlarmHelper.alarm(normalTimer, content)
                 SynthesizerHelper.speak(txt)
 
                 YTaskApplication.currentApplication.showMessage(txt)
                 YTaskApplication.currentApplication.refresh()
+
+                YTaskApplication.currentApplication.startActivity(TaskListActivity::class.java)
+
 
             } else {
                 Log.e(Constants.TAG_LOG, "添加任务失败 ${it.status?.description}")

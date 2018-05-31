@@ -32,4 +32,34 @@ object Utils {
 
         return result
     }
+
+    fun normalizeDateTimeStr(str: String): String {
+        var result = str
+        with(str) {
+            when {
+                matches("""\d{4}-\d{2}-\d{2}\|\d{2}:\d{2}:\d{2}""".toRegex()) -> {
+                    result = replace("|", " ")
+                }
+                matches("""\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}""".toRegex()) -> {
+                    result = replace("T", " ")
+                }
+                matches("""\d{4}-\d{2}-\d{2}""".toRegex()) -> {
+                    result = "$this 00:00:00"
+                }
+                matches("""\d{2}:\d{2}:\d{2}""".toRegex()) -> {
+                    val now = java.util.Date(java.lang.System.currentTimeMillis())
+                    val dateStr = java.text.SimpleDateFormat("yyyy-MM-dd").format(now)
+                    result = "$dateStr $this"
+                }
+//                isEmpty() -> {
+//                    android.util.Log.d(cn.apier.app.ytask.common.Constants.TAG_LOG, "No Time info")
+//                }
+//                else -> {
+//                    android.util.Log.d(cn.apier.app.ytask.common.Constants.TAG_LOG, "Unknown")
+//                }
+            }
+        }
+        return result
+    }
+
 }

@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="84dp"
         android:layout_marginTop="136dp"
-        android:text="大声说出你的想法"
+        android:text="添加任务、显示任务"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

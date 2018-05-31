@@ -99,18 +99,23 @@ class YTaskApplication : Application() {
 
     override fun startActivity(intent: Intent) {
 //        super.startActivity(intent)
-
         this.currentActivity?.let {
             if (!it.daemonActivity()) {
                 it.finish()
             }
             super.startActivity(intent)
-
         }
     }
 
 
     fun <T : BaseActivity> startActivity(clazz: Class<T>) {
+        this.currentActivity?.let {
+            if (it.javaClass == clazz) {
+                it.refresh()
+                return
+            }
+        }
+
         val intent = Intent(this, clazz)
         this.startActivity(intent)
     }

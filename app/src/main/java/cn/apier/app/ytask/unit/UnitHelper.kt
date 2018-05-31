@@ -1,18 +1,14 @@
 package cn.apier.app.ytask.unit
 
-import android.util.Log
+//import com.baidu.aip.chatkit.model.User
 import cn.apier.app.voice.nlp.NLPResult
-import cn.apier.app.ytask.api.ApiFactory
-import cn.apier.app.ytask.api.TaskApi
 import cn.apier.app.ytask.common.Constants
 import cn.apier.app.ytask.scene.SceneActionDispatcher
 import cn.apier.app.ytask.scene.SceneActions
-//import com.baidu.aip.chatkit.model.User
 import com.baidu.aip.unit.APIService
 import com.baidu.aip.unit.exception.UnitError
 import com.baidu.aip.unit.listener.OnResultListener
 import com.baidu.aip.unit.model.UnitResponseResult
-import java.util.*
 
 /**
  * Created by yanjunhua on 2017/9/24.
